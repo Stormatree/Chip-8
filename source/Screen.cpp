@@ -1,14 +1,16 @@
 #include <stdio.h>
+#include <math.h>
 #include "Screen.hpp"
 
 Screen::Screen(){
 	_title = "Chip-8 Emulator";
 
-	_w = 1024;
-	_h = 512;
+	size(1024, 512);
 
-	_x = 64;
-	_y = 32;
+	pixels(64, 32);
+
+	offColour(0.f, 0.f, 0.f);
+	onColour(1.f, 1.f, 1.f);
 }
 
 Screen::~Screen(){
@@ -28,6 +30,18 @@ void Screen::size(int width, int height){
 void Screen::pixels(int width, int height){
 	_x = width;
 	_y = height;
+}
+
+void Screen::onColour(float r, float g, float b){
+	_rOn = r;
+	_gOn = g;
+	_bOn = b;
+}
+
+void Screen::offColour(float r, float g, float b){
+	_rOff = r;
+	_gOff = g;
+	_bOff = b;
 }
 
 bool Screen::initiate(){
@@ -57,10 +71,10 @@ void Screen::drawPixel(int x, int y, bool fill){
 	};
 
 	if (fill){
-		SDL_FillRect(_screen, &pixel, SDL_MapRGB(_screen->format, 255, 255, 255));
+		SDL_FillRect(_screen, &pixel, SDL_MapRGB(_screen->format, (int)round(_rOn * 255), (int)round(_gOn * 255), (int)round(_bOn * 255)));
 	}
 	else{
-		SDL_FillRect(_screen, &pixel, SDL_MapRGB(_screen->format, 0, 0, 0));
+		SDL_FillRect(_screen, &pixel, SDL_MapRGB(_screen->format, (int)round(_rOff * 255), (int)round(_gOff * 255), (int)round(_bOff * 255)));
 	}
 }
 
@@ -71,5 +85,5 @@ void Screen::drawSurface(int x, int y, SDL_Surface* surface){
 
 void Screen::render(){
 	SDL_UpdateWindowSurface(_window);
-	SDL_FillRect(_screen, 0, 0);
+	SDL_FillRect(_screen, 0, SDL_MapRGB(_screen->format, (int)round(_rOff * 255), (int)round(_gOff * 255), (int)round(_bOff * 255)));
 }
