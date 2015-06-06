@@ -62,6 +62,11 @@ bool Screen::initiate(){
 	return true;
 }
 
+void Screen::render(){
+	SDL_UpdateWindowSurface(_window);
+	SDL_FillRect(_screen, 0, SDL_MapRGB(_screen->format, (int)round(_rOff * 255), (int)round(_gOff * 255), (int)round(_bOff * 255)));
+}
+
 void Screen::drawPixel(int x, int y, bool fill){
 	SDL_Rect pixel = {
 		x * (_w / _x),
@@ -83,7 +88,28 @@ void Screen::drawSurface(int x, int y, SDL_Surface* surface){
 	SDL_BlitSurface(surface, 0, _screen, &dest);
 }
 
-void Screen::render(){
-	SDL_UpdateWindowSurface(_window);
-	SDL_FillRect(_screen, 0, SDL_MapRGB(_screen->format, (int)round(_rOff * 255), (int)round(_gOff * 255), (int)round(_bOff * 255)));
+void Screen::drawTest(int x, int y){
+	drawPixel(0 + x, 0 + y);
+	drawPixel(0 + x, 3 + y);
+	drawPixel(1 + x, 4 + y);
+	drawPixel(2 + x, 4 + y);
+	drawPixel(3 + x, 4 + y);
+	drawPixel(4 + x, 3 + y);
+	drawPixel(4 + x, 0 + y);
+	drawPixel(6 + x, 0 + y);
+	drawPixel(6 + x, 1 + y);
+	drawPixel(6 + x, 2 + y);
+	drawPixel(6 + x, 3 + y);
+	drawPixel(6 + x, 4 + y);
+	drawPixel(7 + x, 2 + y);
+	drawPixel(8 + x, 2 + y);
+	drawPixel(9 + x, 0 + y);
+	drawPixel(9 + x, 1 + y);
+	drawPixel(9 + x, 2 + y);
+	drawPixel(9 + x, 3 + y);
+	drawPixel(9 + x, 4 + y);
+	drawPixel(11 + x, 0 + y);
+	drawPixel(11 + x, 2 + y);
+	drawPixel(11 + x, 3 + y);
+	drawPixel(11 + x, 4 + y);
 }
