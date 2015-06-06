@@ -81,7 +81,7 @@ void Console::clear(int line){
 
 void Console::purge(){
 	for (SurfaceMap::iterator i = _text.begin(); i != _text.end(); i++){
-		SDL_FreeSurface( i->second);
+		SDL_FreeSurface(i->second);
 	}
 
 	_text.clear();

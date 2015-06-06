@@ -2,6 +2,8 @@
 #include <time.h>
 #include "Screen.hpp"
 #include "Console.hpp"
+#include "Interpreter.hpp"
+#include "Font.hpp"
 
 void pixels(Screen& screen, int x = 0, int y = 0);
 void text(Console& console, int y = 0);
@@ -15,17 +17,21 @@ int main(int argc, char* argv[]){
 	//screen.offColour(0.f, .15f, .05f);
 	//screen.onColour(.1f, .75f, .25f);
 
-	Console console;
+	//Console console;
 	//console.font("perfect.ttf");
 	//console.size(16);
+	
+	Interpreter interpreter;
+	interpreter.load("../asset/test.rom");
+	interpreter.run();
 
 	SDL_Event e;
 	bool running;
 		
 	running = screen.initiate();
-	running = console.initiate();
+	//running = console.initiate();
 
-	text(console, 0);
+	//text(console, 0);
 	
 	while (running){
 		while (SDL_PollEvent(&e) != 0){
@@ -36,7 +42,7 @@ int main(int argc, char* argv[]){
 
 		pixels(screen, 25, 12);
 
-		console.drawTo(screen);
+		//console.drawTo(screen);
 
 		screen.render();
 	}
@@ -45,9 +51,9 @@ int main(int argc, char* argv[]){
 }
 
 void text(Console& console, int y){
-	console.print("60 FPS 22ms", 0 + y, 0.f, 1.f, 0.f);
-	console.print("Game Started", 1 + y, 1.f, 1.f, 1.f, 5000);
-	console.print("Fake Warning", 2 + y, 1.f, 0.f, 0.f, 2500);
+	console.print("Fake Data 60 FPS 22ms", 0 + y, 0.f, 1.f, 0.f);
+	console.print("Fake Event Happened", 1 + y, 1.f, 1.f, 1.f, 5000);
+	console.print("Fake Warning!!!", 2 + y, 1.f, 0.f, 0.f, 2500);
 }
 
 void pixels(Screen& screen, int x, int y){
