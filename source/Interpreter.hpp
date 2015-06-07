@@ -19,12 +19,16 @@ class Interpreter{
 	uint8_t _stack[STACK_SIZE];
 	uint8_t _keys[KEY_SIZE];
 	
-	uint16_t _pc;
 	uint16_t _i;
 	uint8_t _delay;
 	uint8_t _sound;
+
+	uint16_t _pc;
+	uint16_t _length;
 	
 	void _disassemble();
+
+	//void _input();
 
 public:
 	bool load(const char* filepath);

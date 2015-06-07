@@ -7,8 +7,10 @@ int main(int argc, char* argv[]){
 	printf("Chip-8 Emulator\n---------------\n");
 
 	Interpreter interpreter;
-	if (interpreter.load("../asset/game/BLINKY"))
+	if (interpreter.load("../asset/game/tetris"))
 		interpreter.print();
+
+	printf("\n");
 
 	Screen screen;
 	screen.initiate();
