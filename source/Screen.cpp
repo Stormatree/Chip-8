@@ -88,28 +88,17 @@ void Screen::drawSurface(int x, int y, SDL_Surface* surface){
 	SDL_BlitSurface(surface, 0, _screen, &dest);
 }
 
-void Screen::drawTest(int x, int y){
-	drawPixel(0 + x, 0 + y);
-	drawPixel(0 + x, 3 + y);
-	drawPixel(1 + x, 4 + y);
-	drawPixel(2 + x, 4 + y);
-	drawPixel(3 + x, 4 + y);
-	drawPixel(4 + x, 3 + y);
-	drawPixel(4 + x, 0 + y);
-	drawPixel(6 + x, 0 + y);
-	drawPixel(6 + x, 1 + y);
-	drawPixel(6 + x, 2 + y);
-	drawPixel(6 + x, 3 + y);
-	drawPixel(6 + x, 4 + y);
-	drawPixel(7 + x, 2 + y);
-	drawPixel(8 + x, 2 + y);
-	drawPixel(9 + x, 0 + y);
-	drawPixel(9 + x, 1 + y);
-	drawPixel(9 + x, 2 + y);
-	drawPixel(9 + x, 3 + y);
-	drawPixel(9 + x, 4 + y);
-	drawPixel(11 + x, 0 + y);
-	drawPixel(11 + x, 2 + y);
-	drawPixel(11 + x, 3 + y);
-	drawPixel(11 + x, 4 + y);
+void Screen::drawSprite(int x, int y, uint8_t buffer[], int n, int width, int height){
+	for (int dy = 0; dy < height; dy++){
+		uint8_t line = buffer[dy + (n * height)];
+		
+		uint8_t mask = (uint8_t)pow(2.f, width - 1);
+
+		for (int dx = 0; dx < 8; dx++){
+			if (line & mask)
+				drawPixel(x + dx, y + dy);
+
+			mask /= 2;
+		}
+	}
 }

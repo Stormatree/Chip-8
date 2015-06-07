@@ -40,7 +40,7 @@ void Interpreter::reset(){
 }
 
 void Interpreter::print(){
-	for (int i = 0; i < MEMORY_SIZE; i++){
+	for (int i = ENTRY_POINT; i < MEMORY_SIZE; i++){
 		if (i % 16 == 0)
 			if (!i)
 				printf("% 5d : ", i);
@@ -164,5 +164,5 @@ void Interpreter::_disassemble(){
 		break;
 	}
 
-	printf(" - %04X\n", opcode);
+	printf(" - 0x%04X\n", opcode);
 }

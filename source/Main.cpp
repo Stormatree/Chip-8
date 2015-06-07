@@ -1,5 +1,6 @@
 #include "Screen.hpp"
 #include "Interpreter.hpp"
+#include "Font.hpp"
 
 #undef main
 
@@ -7,7 +8,7 @@ int main(int argc, char* argv[]){
 	printf("Chip-8 Emulator\n---------------\n");
 
 	Interpreter interpreter;
-	if (interpreter.load("../asset/game/tetris"))
+	if (interpreter.load("../asset/Test.rom"))
 		interpreter.print();
 
 	printf("\n");
@@ -27,7 +28,9 @@ int main(int argc, char* argv[]){
 
 		interpreter.tick();
 
-		screen.drawTest(25, 12);
+		screen.drawSprite(25, 12, Font8x5, 0);
+		screen.drawSprite(31, 12, Font8x5, 1);
+
 		screen.render();
 	}
 

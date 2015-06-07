@@ -27,9 +27,8 @@ public:
 	bool initiate();
 
 	void drawPixel(int x, int y, bool fill = true);
-	void drawBuffer(int x, int y, uint8_t buffer[], int width, int height, int sprite){};
+	void drawSprite(int x, int y, uint8_t buffer[], int n, int width = 8, int height = 5);
 	void drawSurface(int x, int y, SDL_Surface* surface);
-	void drawTest(int x, int y);
 
 	void render();
 };

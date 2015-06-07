@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-static uint8_t Font4x5[] = {
+static uint8_t Font8x5[] = {
 	//(:
 	0x88,
 	0x00,
