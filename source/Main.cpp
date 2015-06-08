@@ -8,13 +8,14 @@ int main(int argc, char* argv[]){
 	printf("Chip-8 Emulator\n---------------\n");
 
 	Interpreter interpreter;
-	if (interpreter.load("../asset/game/TETRIS"))
-		interpreter.print();
-
-	printf("\n");
 
 	Screen screen;
 	screen.initiate();
+
+	if (interpreter.load("../asset/game/BLINKY"))
+		interpreter.print();
+
+	printf("\n");
 
 	bool running = true;
 	SDL_Event e;
@@ -27,10 +28,12 @@ int main(int argc, char* argv[]){
 		}
 
 		interpreter.input(0x0000);
-		interpreter.execute();
+		interpreter.update();
 		interpreter.render(screen);
 
 		screen.render();
+
+		//throttle speed
 	}
 
 	return 0;

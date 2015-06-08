@@ -1,9 +1,28 @@
 #include "Interpreter.hpp"
 #include "Font.hpp"
 
-bool Interpreter::load(const char* filepath){
+Interpreter::Interpreter(){
 	reset();
+}
 
+void Interpreter::reset(){
+	std::fill(_memory, _memory + MEMORY_SIZE, NULL_VAL);
+	std::fill(_var, _var + VAR_SIZE, NULL_VAL);
+	std::fill(_stack, _stack + STACK_SIZE, NULL_VAL);
+	std::fill(_screen, _screen + SCREEN_HEIGHT * SCREEN_WIDTH, NULL_VAL);
+
+	_delay = NULL_VAL;
+	_sound = NULL_VAL;
+	_i = NULL_VAL;
+
+	_pc = ENTRY_POINT;
+	_program_len = NULL_VAL;
+
+	for (int i = 0; i < FONT_LENGTH; i++)
+		_memory[i] = Font8x5[i];
+}
+
+bool Interpreter::load(const char* filepath){
 	std::ifstream file(filepath, std::fstream::binary);
 	
 	if (file){
@@ -13,7 +32,7 @@ bool Interpreter::load(const char* filepath){
 			_memory[i] = file.get();
 		}
 
-		_length = i - ENTRY_POINT;
+		_program_len = i - ENTRY_POINT;
 
 		return true;
 	}
@@ -23,31 +42,15 @@ bool Interpreter::load(const char* filepath){
 	}
 }
 
-void Interpreter::reset(){
-	std::fill(_memory, _memory + MEMORY_SIZE, NULL_VAL);
-	std::fill(_var, _var + VAR_SIZE, NULL_VAL);
-	std::fill(_stack, _stack + STACK_SIZE, NULL_VAL);
-	std::fill(_keys, _keys + KEY_SIZE, NULL_VAL);
-	std::fill(_screen, _screen + SCREEN_HEIGHT * SCREEN_WIDTH, NULL_VAL);
-
-	_delay = NULL_VAL;
-	_sound = NULL_VAL;
-	_i = NULL_VAL;
-
-	_pc = ENTRY_POINT;
-	_length = NULL_VAL;
-
-	for (int i = 0; i < FONT_LENGTH; i++)
-		_memory[i] = Font8x5[i];
-}
-
 void Interpreter::input(uint16_t keys){
-
+	//edit _keys
 }
 
-void Interpreter::execute(){
-	if (_pc < _length + ENTRY_POINT)
-		op_auto((_memory[_pc] << 8) | (_memory[_pc + 1]));
+void Interpreter::update(){
+	//update timers
+
+	if (_pc < _program_len + ENTRY_POINT)
+		op_auto(_memory[_pc], _memory[_pc + 1]);
 }
 
 void Interpreter::render(Screen& screen){
@@ -69,82 +72,74 @@ void Interpreter::render(Screen& screen){
 	screen.drawSprite(7 * 5, 1 * 6, Font8x5, 0xF);
 }
 
-void Interpreter::op_auto(uint16_t opcode){
-	printf("% 5d : ", _pc);
-
-	uint8_t lower = opcode >> 8;
-	uint8_t upper = opcode & 0x00FF;
-
+bool Interpreter::op_auto(uint8_t lower, uint8_t upper){
 	uint8_t nibble_0 = lower >> 4;
-	uint8_t nibble_1 = lower & 0x0F;
+	uint8_t nibble_1 = lower & 0xF;
 	uint8_t nibble_2 = upper >> 4;
-	uint8_t nibble_3 = upper & 0x0F;
+	uint8_t nibble_3 = upper & 0xF;
 
-	uint16_t tail = opcode & 0x0FFF;
+	uint16_t tail = (lower << 8) | upper & 0x0FFF;
 
 	switch (nibble_0){
 	case 0x0:
 		switch (upper){
-			case 0xE0: op_00E0(); break;
-			case 0xEE: op_00EE(); break;
-			default: op_0NNN(tail); break;
+			case 0xE0: op_00E0(); return true;
+			case 0xEE: op_00EE(); return true;
+			default: op_0NNN(tail); return true;
 		}
-		break;
 
-	case 0x1: op_1NNN(tail); break;
-	case 0x2: op_2NNN(tail); break;
-	case 0x3: op_3XNN(nibble_1, upper); break;
-	case 0x4: op_4XNN(nibble_1, upper); break;
-	case 0x5: op_5XY0(nibble_1, nibble_2); break;
-	case 0x6: op_6XNN(nibble_1, upper); break;
-	case 0x7: op_7XNN(nibble_1, upper); break;
+	case 0x1: op_1NNN(tail); return true;
+	case 0x2: op_2NNN(tail); return true;
+	case 0x3: op_3XNN(nibble_1, upper); return true;
+	case 0x4: op_4XNN(nibble_1, upper); return true;
+	case 0x5: op_5XY0(nibble_1, nibble_2); return true;
+	case 0x6: op_6XNN(nibble_1, upper); return true;
+	case 0x7: op_7XNN(nibble_1, upper); return true;
 
 	case 0x8:
 		switch (nibble_3){
-			case 0x0: op_8XY0(nibble_1, nibble_2); break;
-			case 0x1: op_8XY1(nibble_1, nibble_2); break;
-			case 0x2: op_8XY2(nibble_1, nibble_2); break;
-			case 0x3: op_8XY3(nibble_1, nibble_2); break;
-			case 0x4: op_8XY4(nibble_1, nibble_2); break;
-			case 0x5: op_8XY5(nibble_1, nibble_2); break;
-			case 0x6: op_8XY6(nibble_1, nibble_2); break;
-			case 0x7: op_8XY7(nibble_1, nibble_2); break;
-			case 0xE: op_8XYE(nibble_1, nibble_2); break;
-			default: printf("8..."); break;
+			case 0x0: op_8XY0(nibble_1, nibble_2); return true;
+			case 0x1: op_8XY1(nibble_1, nibble_2); return true;
+			case 0x2: op_8XY2(nibble_1, nibble_2); return true;
+			case 0x3: op_8XY3(nibble_1, nibble_2); return true;
+			case 0x4: op_8XY4(nibble_1, nibble_2); return true;
+			case 0x5: op_8XY5(nibble_1, nibble_2); return true;
+			case 0x6: op_8XY6(nibble_1, nibble_2); return true;
+			case 0x7: op_8XY7(nibble_1, nibble_2); return true;
+			case 0xE: op_8XYE(nibble_1, nibble_2); return true;
+			default: return false;
 		}
-		break;
 
-	case 0x9: op_9XY0(nibble_1, nibble_2); break;
-	case 0xA: op_ANNN(tail); break;
-	case 0xB: op_BNNN(tail); break;
-	case 0xC: op_CXNN(nibble_1, upper); break;
-	case 0xD: op_DXYN(nibble_1, nibble_2, nibble_3); break;
+	case 0x9: op_9XY0(nibble_1, nibble_2); return true;
+	case 0xA: op_ANNN(tail); return true;
+	case 0xB: op_BNNN(tail); return true;
+	case 0xC: op_CXNN(nibble_1, upper); return true;
+	case 0xD: op_DXYN(nibble_1, nibble_2, nibble_3); return true;
 
 	case 0xE:
 		switch (upper){
-			case 0x9E: op_EX9E(nibble_1); break;
-			case 0xA1: op_EXA1(nibble_1); break;
-			default: printf("E..."); break;
+			case 0x9E: op_EX9E(nibble_1); return true;
+			case 0xA1: op_EXA1(nibble_1); return true;
+			default: return false;
 		}
-		break;
 
 	case 0xF:
 		switch (upper){
-			case 0x07: op_FX07(nibble_1); break;
-			case 0x0A: op_FX0A(nibble_1); break;
-			case 0x15: op_FX15(nibble_1); break;
-			case 0x18: op_FX18(nibble_1); break;
-			case 0x1E: op_FX1E(nibble_1); break;
-			case 0x29: op_FX29(nibble_1); break;
-			case 0x33: op_FX33(nibble_1); break;
-			case 0x55: op_FX55(nibble_1); break;
-			case 0x65: op_FX65(nibble_1); break;
-			default: printf("F..."); break;
+			case 0x07: op_FX07(nibble_1); return true;
+			case 0x0A: op_FX0A(nibble_1); return true;
+			case 0x15: op_FX15(nibble_1); return true;
+			case 0x18: op_FX18(nibble_1); return true;
+			case 0x1E: op_FX1E(nibble_1); return true;
+			case 0x29: op_FX29(nibble_1); return true;
+			case 0x33: op_FX33(nibble_1); return true;
+			case 0x55: op_FX55(nibble_1); return true;
+			case 0x65: op_FX65(nibble_1); return true;
+			default: return false;
 		}
-		break;
-	}
 
-	printf(" - 0x%04X\n", opcode);
+	default:
+		return false;
+	}
 }
 
 void Interpreter::print(){

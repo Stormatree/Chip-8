@@ -9,36 +9,39 @@
 #define STACK_SIZE 16
 #define SCREEN_HEIGHT 32
 #define SCREEN_WIDTH 64
-#define KEY_SIZE 16
 #define ENTRY_POINT 0x200
 #define NULL_VAL 0x0
 
 class Interpreter{
+	uint8_t _memory[MEMORY_SIZE];
 	uint8_t _screen[SCREEN_HEIGHT * SCREEN_WIDTH];
 	uint8_t _var[VAR_SIZE];
-	uint8_t _memory[MEMORY_SIZE];
-	uint8_t _keys[KEY_SIZE];
 	uint16_t _stack[STACK_SIZE];
+
+	uint16_t _keys;
 	
-	uint16_t _i;
 	uint8_t _delay;
 	uint8_t _sound;
 
 	uint16_t _pc;
-	uint16_t _length;
+	uint16_t _i;
+
+	uint16_t _program_len;
 
 	void _tick();
 	void _jump(uint16_t pc);
 
 public:
-	bool load(const char* filepath);
-	void reset();
+	Interpreter();
 
-	void input(uint16_t keys = 0x0);
-	void execute();
+	void reset();
+	bool load(const char* filepath);
+	
+	void input(uint16_t keys);
+	void update();
 	void render(Screen& screen);
 
-	void op_auto(uint16_t opcode);
+	bool op_auto(uint8_t lower, uint8_t upper);
 
 	void op_00E0();
 	void op_00EE();
