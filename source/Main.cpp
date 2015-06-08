@@ -1,21 +1,16 @@
-#include "Screen.hpp"
-#include "Interpreter.hpp"
-#include "Font.hpp"
+#include "Render/Screen.hpp"
+#include "Chip8/Interpreter.hpp"
 
 #undef main
 
 int main(int argc, char* argv[]){
-	printf("Chip-8 Emulator\n---------------\n");
-
 	Interpreter interpreter;
 
 	Screen screen;
 	screen.initiate();
 
-	if (interpreter.load("../asset/game/BLINKY"))
+	if (interpreter.load("../asset/game/TETRIS"))
 		interpreter.print();
-
-	printf("\n");
 
 	bool running = true;
 	SDL_Event e;
@@ -32,8 +27,6 @@ int main(int argc, char* argv[]){
 		interpreter.render(screen);
 
 		screen.render();
-
-		//throttle speed
 	}
 
 	return 0;
