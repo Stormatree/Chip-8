@@ -8,7 +8,7 @@ int main(int argc, char* argv[]){
 	printf("Chip-8 Emulator\n---------------\n");
 
 	Interpreter interpreter;
-	if (interpreter.load("../asset/Test.rom"))
+	if (interpreter.load("../asset/game/TETRIS"))
 		interpreter.print();
 
 	printf("\n");
@@ -26,10 +26,9 @@ int main(int argc, char* argv[]){
 			}
 		}
 
-		interpreter.tick();
-
-		screen.drawSprite(25, 12, Font8x5, 0);
-		screen.drawSprite(31, 12, Font8x5, 1);
+		interpreter.input(0x0000);
+		interpreter.execute();
+		interpreter.render(screen);
 
 		screen.render();
 	}

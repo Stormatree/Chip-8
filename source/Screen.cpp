@@ -91,14 +91,13 @@ void Screen::drawSurface(int x, int y, SDL_Surface* surface){
 void Screen::drawSprite(int x, int y, uint8_t buffer[], int n, int width, int height){
 	for (int dy = 0; dy < height; dy++){
 		uint8_t line = buffer[dy + (n * height)];
-		
 		uint8_t mask = (uint8_t)pow(2.f, width - 1);
 
-		for (int dx = 0; dx < 8; dx++){
+		for (int dx = 0; dx < width; dx++){
 			if (line & mask)
 				drawPixel(x + dx, y + dy);
 
-			mask /= 2;
+			mask >>= 1;
 		}
 	}
 }
