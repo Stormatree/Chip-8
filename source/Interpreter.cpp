@@ -85,60 +85,60 @@ void Interpreter::op_auto(uint16_t opcode){
 	switch (nibble_0){
 	case 0x0:
 		switch (upper){
-			case 0xE0: op_00E0(opcode); break;
-			case 0xEE: op_00EE(opcode); break;
-			default: op_0NNN(opcode); break;
+			case 0xE0: op_00E0(); break;
+			case 0xEE: op_00EE(); break;
+			default: op_0NNN(tail); break;
 		}
 		break;
 
-	case 0x1: op_1NNN(opcode); break;
-	case 0x2: op_2NNN(opcode); break;
-	case 0x3: op_3XNN(opcode); break;
-	case 0x4: op_4XNN(opcode); break;
-	case 0x5: op_5XY0(opcode); break;
-	case 0x6: op_6XNN(opcode); break;
-	case 0x7: op_7XNN(opcode); break;
+	case 0x1: op_1NNN(tail); break;
+	case 0x2: op_2NNN(tail); break;
+	case 0x3: op_3XNN(nibble_1, upper); break;
+	case 0x4: op_4XNN(nibble_1, upper); break;
+	case 0x5: op_5XY0(nibble_1, nibble_2); break;
+	case 0x6: op_6XNN(nibble_1, upper); break;
+	case 0x7: op_7XNN(nibble_1, upper); break;
 
 	case 0x8:
 		switch (nibble_3){
-			case 0x0: op_8XY0(opcode); break;
-			case 0x1: op_8XY1(opcode); break;
-			case 0x2: op_8XY2(opcode); break;
-			case 0x3: op_8XY3(opcode); break;
-			case 0x4: op_8XY4(opcode); break;
-			case 0x5: op_8XY5(opcode); break;
-			case 0x6: op_8XY6(opcode); break;
-			case 0x7: op_8XY7(opcode); break;
-			case 0xE: op_8XYE(opcode); break;
+			case 0x0: op_8XY0(nibble_1, nibble_2); break;
+			case 0x1: op_8XY1(nibble_1, nibble_2); break;
+			case 0x2: op_8XY2(nibble_1, nibble_2); break;
+			case 0x3: op_8XY3(nibble_1, nibble_2); break;
+			case 0x4: op_8XY4(nibble_1, nibble_2); break;
+			case 0x5: op_8XY5(nibble_1, nibble_2); break;
+			case 0x6: op_8XY6(nibble_1, nibble_2); break;
+			case 0x7: op_8XY7(nibble_1, nibble_2); break;
+			case 0xE: op_8XYE(nibble_1, nibble_2); break;
 			default: printf("8..."); break;
 		}
 		break;
 
-	case 0x9: op_9XY0(opcode); break;
-	case 0xA: op_ANNN(opcode); break;
-	case 0xB: op_BNNN(opcode); break;
-	case 0xC: op_CXNN(opcode); break;
-	case 0xD: op_DXYN(opcode); break;
+	case 0x9: op_9XY0(nibble_1, nibble_2); break;
+	case 0xA: op_ANNN(tail); break;
+	case 0xB: op_BNNN(tail); break;
+	case 0xC: op_CXNN(nibble_1, upper); break;
+	case 0xD: op_DXYN(nibble_1, nibble_2, nibble_3); break;
 
 	case 0xE:
-		switch (opcode & 0xFF){
-			case 0x9E: op_EX9E(opcode); break;
-			case 0xA1: op_EXA1(opcode); break;
+		switch (upper){
+			case 0x9E: op_EX9E(nibble_1); break;
+			case 0xA1: op_EXA1(nibble_1); break;
 			default: printf("E..."); break;
 		}
 		break;
 
 	case 0xF:
 		switch (upper){
-			case 0x07: op_FX07(opcode); break;
-			case 0x0A: op_FX0A(opcode); break;
-			case 0x15: op_FX15(opcode); break;
-			case 0x18: op_FX18(opcode); break;
-			case 0x1E: op_FX1E(opcode); break;
-			case 0x29: op_FX29(opcode); break;
-			case 0x33: op_FX33(opcode); break;
-			case 0x55: op_FX55(opcode); break;
-			case 0x65: op_FX65(opcode); break;
+			case 0x07: op_FX07(nibble_1); break;
+			case 0x0A: op_FX0A(nibble_1); break;
+			case 0x15: op_FX15(nibble_1); break;
+			case 0x18: op_FX18(nibble_1); break;
+			case 0x1E: op_FX1E(nibble_1); break;
+			case 0x29: op_FX29(nibble_1); break;
+			case 0x33: op_FX33(nibble_1); break;
+			case 0x55: op_FX55(nibble_1); break;
+			case 0x65: op_FX65(nibble_1); break;
 			default: printf("F..."); break;
 		}
 		break;

@@ -40,43 +40,7 @@ public:
 
 	void op_auto(uint16_t opcode);
 
-	void op_00E0(uint16_t opcode);
-	void op_00EE(uint16_t opcode);
-	void op_0NNN(uint16_t opcode);
-	void op_1NNN(uint16_t opcode);
-	void op_2NNN(uint16_t opcode);
-	void op_3XNN(uint16_t opcode);
-	void op_4XNN(uint16_t opcode);
-	void op_5XY0(uint16_t opcode);
-	void op_6XNN(uint16_t opcode);
-	void op_7XNN(uint16_t opcode);
-	void op_8XY0(uint16_t opcode);
-	void op_8XY1(uint16_t opcode);
-	void op_8XY2(uint16_t opcode);
-	void op_8XY3(uint16_t opcode);
-	void op_8XY4(uint16_t opcode);
-	void op_8XY5(uint16_t opcode);
-	void op_8XY6(uint16_t opcode);
-	void op_8XY7(uint16_t opcode);
-	void op_8XYE(uint16_t opcode);
-	void op_9XY0(uint16_t opcode);
-	void op_ANNN(uint16_t opcode);
-	void op_BNNN(uint16_t opcode);
-	void op_CXNN(uint16_t opcode);
-	void op_DXYN(uint16_t opcode);
-	void op_EX9E(uint16_t opcode);
-	void op_EXA1(uint16_t opcode);
-	void op_FX07(uint16_t opcode);
-	void op_FX0A(uint16_t opcode);
-	void op_FX15(uint16_t opcode);
-	void op_FX18(uint16_t opcode);
-	void op_FX1E(uint16_t opcode);
-	void op_FX29(uint16_t opcode);
-	void op_FX33(uint16_t opcode);
-	void op_FX55(uint16_t opcode);
-	void op_FX65(uint16_t opcode);
-
-	/*
+	void op_00E0();
 	void op_00EE();
 	void op_0NNN(uint16_t NNN);
 	void op_1NNN(uint16_t NNN);
@@ -98,7 +62,7 @@ public:
 	void op_9XY0(uint8_t X, uint8_t Y);
 	void op_ANNN(uint16_t NNN);
 	void op_BNNN(uint16_t NNN);
-	void op_CXNN(uint8_t NN);
+	void op_CXNN(uint8_t X, uint8_t NN);
 	void op_DXYN(uint8_t X, uint8_t Y, uint8_t N);
 	void op_EX9E(uint8_t X);
 	void op_EXA1(uint8_t X);
@@ -111,7 +75,6 @@ public:
 	void op_FX33(uint8_t X);
 	void op_FX55(uint8_t X);
 	void op_FX65(uint8_t X);
-	*/
 
 	void print();
 };
