@@ -1,28 +1,42 @@
 #include "Interpreter.hpp"
 #include "Font.hpp"
 
-Interpreter::Interpreter(){
-	reset();
+void Interpreter::_tick(){
+	if (ENTRY_POINT <= _pc + 2 && _pc < _program_len + ENTRY_POINT)
+		_pc += 2;
+}
+
+void Interpreter::_skip(){
+	if (ENTRY_POINT <= _pc + 4 && _pc + 4 < _program_len + ENTRY_POINT)
+		_pc += 4;
+}
+
+void Interpreter::_jump(uint16_t& reg, uint16_t val){
+	if (ENTRY_POINT <= val && val < _program_len + ENTRY_POINT)
+		reg = val;
 }
 
 void Interpreter::reset(){
-	std::fill(_memory, _memory + MEMORY_SIZE, NULL_VAL);
-	std::fill(_var, _var + VAR_SIZE, NULL_VAL);
-	std::fill(_stack, _stack + STACK_SIZE, NULL_VAL);
-	std::fill(_screen, _screen + SCREEN_HEIGHT * SCREEN_WIDTH, NULL_VAL);
+	std::fill(_memory, _memory + MEMORY_SIZE, 0x0);
+	std::fill(_var, _var + VAR_SIZE, 0x0);
+	std::fill(_screen, _screen + SCREEN_HEIGHT * SCREEN_WIDTH, 0x0);
 
-	_delay = NULL_VAL;
-	_sound = NULL_VAL;
-	_i = NULL_VAL;
+	_delay = 0x0;
+	_sound = 0x0;
 
 	_pc = ENTRY_POINT;
-	_program_len = NULL_VAL;
+	_sp = 0x0;
+	_i = 0x0;
+	
+	_program_len = 0x0;
 
 	for (int i = 0; i < FONT_LENGTH; i++)
 		_memory[i] = Font8x5[i];
 }
 
 bool Interpreter::load(const char* filepath){
+	reset();
+
 	std::ifstream file(filepath, std::fstream::binary);
 	
 	if (file){
@@ -54,22 +68,22 @@ void Interpreter::update(){
 }
 
 void Interpreter::render(Screen& screen){
-	screen.drawSprite(0 * 5, 0, Font8x5, 0x0);
-	screen.drawSprite(1 * 5, 0, Font8x5, 0x1);
-	screen.drawSprite(2 * 5, 0, Font8x5, 0x2);
-	screen.drawSprite(3 * 5, 0, Font8x5, 0x3);
-	screen.drawSprite(4 * 5, 0, Font8x5, 0x4);
-	screen.drawSprite(5 * 5, 0, Font8x5, 0x5);
-	screen.drawSprite(6 * 5, 0, Font8x5, 0x6);
-	screen.drawSprite(7 * 5, 0, Font8x5, 0x7);
-	screen.drawSprite(0 * 5, 1 * 6, Font8x5, 0x8);
-	screen.drawSprite(1 * 5, 1 * 6, Font8x5, 0x9);
-	screen.drawSprite(2 * 5, 1 * 6, Font8x5, 0xA);
-	screen.drawSprite(3 * 5, 1 * 6, Font8x5, 0xB);
-	screen.drawSprite(4 * 5, 1 * 6, Font8x5, 0xC);
-	screen.drawSprite(5 * 5, 1 * 6, Font8x5, 0xD);
-	screen.drawSprite(6 * 5, 1 * 6, Font8x5, 0xE);
-	screen.drawSprite(7 * 5, 1 * 6, Font8x5, 0xF);
+	screen.drawSprite(0 * 5, 0, _memory, 0x0);
+	screen.drawSprite(1 * 5, 0, _memory, 0x1);
+	screen.drawSprite(2 * 5, 0, _memory, 0x2);
+	screen.drawSprite(3 * 5, 0, _memory, 0x3);
+	screen.drawSprite(4 * 5, 0, _memory, 0x4);
+	screen.drawSprite(5 * 5, 0, _memory, 0x5);
+	screen.drawSprite(6 * 5, 0, _memory, 0x6);
+	screen.drawSprite(7 * 5, 0, _memory, 0x7);
+	screen.drawSprite(0 * 5, 1 * 6, _memory, 0x8);
+	screen.drawSprite(1 * 5, 1 * 6, _memory, 0x9);
+	screen.drawSprite(2 * 5, 1 * 6, _memory, 0xA);
+	screen.drawSprite(3 * 5, 1 * 6, _memory, 0xB);
+	screen.drawSprite(4 * 5, 1 * 6, _memory, 0xC);
+	screen.drawSprite(5 * 5, 1 * 6, _memory, 0xD);
+	screen.drawSprite(6 * 5, 1 * 6, _memory, 0xE);
+	screen.drawSprite(7 * 5, 1 * 6, _memory, 0xF);
 }
 
 bool Interpreter::op_auto(uint8_t lower, uint8_t upper){
