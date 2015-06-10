@@ -1,30 +1,8 @@
 #include "Core.hpp"
 #include "Font.hpp"
 
-void Core::_tick(){
-	if (ENTRY_POINT <= _pc + 2 && _pc < _program_len + ENTRY_POINT)
-		_pc += 2;
-}
-
-void Core::_skip(){
-	if (ENTRY_POINT <= _pc + 4 && _pc + 4 < _program_len + ENTRY_POINT)
-		_pc += 4;
-}
-
-void Core::_jump(uint16_t& reg, uint16_t val){
-	if (ENTRY_POINT <= val && val < _program_len + ENTRY_POINT)
-		reg = val;
-}
-
 void Core::reset(){
 	std::fill(_memory, _memory + MEMORY_SIZE, 0x0);
-
-	_delay = 0x0;
-	_sound = 0x0;
-
-	_pc = ENTRY_POINT;
-	_sp = 0x0;
-	_i = 0x0;
 
 	_program_len = 0x0;
 
@@ -61,8 +39,8 @@ void Core::input(uint16_t keys){
 void Core::update(){
 	//update timers
 
-	if (_pc < _program_len + ENTRY_POINT)
-		operate(_memory[_pc], _memory[_pc + 1]);
+	//if (_pc < _program_len + ENTRY_POINT)
+	//	operate(_memory[_pc], _memory[_pc + 1]);
 }
 
 void Core::render(Screen& screen){
@@ -96,4 +74,19 @@ void Core::print(){
 	}
 
 	printf("\n");
+}
+
+void Core::_tick(){
+	//if (ENTRY_POINT <= _pc + 2 && _pc < _program_len + ENTRY_POINT)
+	//	_pc += 2;
+}
+
+void Core::_skip(){
+	//if (ENTRY_POINT <= _pc + 4 && _pc + 4 < _program_len + ENTRY_POINT)
+	//	_pc += 4;
+}
+
+void Core::_jump(uint16_t& reg, uint16_t val){
+	//if (ENTRY_POINT <= val && val < _program_len + ENTRY_POINT)
+	//	reg = val;
 }

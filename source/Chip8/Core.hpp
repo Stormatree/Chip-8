@@ -4,32 +4,39 @@
 #include <fstream>
 #include "Render/Screen.hpp"
 
-#define MEMORY_SIZE 4096
+#define MEMORY_SIZE 0x1000
 
-#define MEM_FONT 0
-#define MEM_FONT_SIZE 32
+#define M_FONT 0x0
+#define M_FONT_SIZE 32
 
-#define MEM_VARS 64
-#define MEM_VARS_SIZE 16
+#define M_VARS 0x40
+#define M_VARS_SIZE 16
 
-#define MEM_KEYS 128
-#define MEM_KEYS_SIZE 16
+#define M_KEYS 0x70
+#define M_KEYS_SIZE 16
 
-#define MEM_SCREEN 256
-#define MEM_SCREEN_SIZE 256
+#define M_PC 0xA0
+#define M_PC_SIZE 2
 
-#define ENTRY_POINT 512
+#define M_SP 0xB0
+#define M_SP_SIZE 2
+
+#define M_I 0xC0
+#define M_I_SIZE 2
+
+#define M_DELAY 0xD0
+#define M_DELAY_SIZE 2
+
+#define M_SOUND 0xE0
+#define M_SOUND_SIZE 2
+
+#define M_SCREEN 0x100
+#define M_SCREEN_SIZE 256
+
+#define ENTRY_POINT 0x200
 
 class Core{
 	uint8_t _memory[MEMORY_SIZE];
-
-	uint8_t _delay;
-	uint8_t _sound;
-
-	uint16_t _pc;
-	uint16_t _sp;
-	uint16_t _i;
-
 	uint16_t _program_len;
 
 protected:
