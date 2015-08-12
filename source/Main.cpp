@@ -1,17 +1,28 @@
-#include "Render/Screen.hpp"
-#include "Chip8/Interpreter.hpp"
+#include "Output/Screen.hpp"
+#include "Chip8/Core.hpp"
+
+#define DEFUALT_ROM "../asset/rom/TEST.rom"
 
 #undef main
 
 int main(int argc, char* argv[]){
-	Interpreter interpreter;
+	// Emulator setup
+	Core emulator;
 
+	if (argc > 1 && emulator.load(argv[1])) // Load from args
+		emulator.print();
+	else if (argc > 1)
+		return 1;
+	else if (emulator.load(DEFUALT_ROM))
+		emulator.print();
+	else
+		return 1;
+
+	// Output setup
 	Screen screen;
 	screen.initiate();
 
-	if (interpreter.load("../asset/game/TETRIS"))
-		interpreter.print();
-
+	// Main loop
 	bool running = true;
 	SDL_Event e;
 
@@ -22,9 +33,9 @@ int main(int argc, char* argv[]){
 			}
 		}
 
-		interpreter.input(0x0000);
-		interpreter.update();
-		interpreter.render(screen);
+		emulator.input(0x0000);
+		emulator.update(0.f);
+		emulator.output(screen);
 
 		screen.render();
 	}

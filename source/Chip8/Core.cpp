@@ -1,28 +1,41 @@
 #include "Core.hpp"
 #include "Font.hpp"
 
-void Core::reset(){
-	std::fill(_memory, _memory + MEMORY_SIZE, 0x0);
+Core::Core(){
+	reset();
+}
 
-	_program_len = 0x0;
+void Core::reset(){
+	std::fill(_memory, _memory + sizeof(_memory) / sizeof(uint8_t), 0x0);
+	std::fill(_screen, _screen + sizeof(_screen) / sizeof(uint8_t), 0x0);
+	std::fill(_font, _font + sizeof(_font) / sizeof(uint8_t), 0x0);
+	std::fill(_var, _var + sizeof(_var) / sizeof(uint8_t), 0x0);
+	std::fill(_key, _key + sizeof(_key) / sizeof(uint8_t), 0x0);
+
+	uint16_t _pc = 0;
+	uint16_t _sp = 0;
+	uint16_t _i = 0;
+
+	uint16_t _delay = 0;
+	uint16_t _sound = 0;
+
+	uint16_t _length = 0;
 
 	for (int i = 0; i < FONT_LENGTH; i++)
-		_memory[i] = Font8x5[i];
+		_font[i] = Font8x5[i];
 }
 
 bool Core::load(const char* filepath){
-	reset();
-
 	std::ifstream file(filepath, std::fstream::binary);
 
 	if (file){
-		int i = ENTRY_POINT;
+		int i = 0;
 
 		for (; file.peek() != EOF; i++){
 			_memory[i] = file.get();
 		}
 
-		_program_len = i - ENTRY_POINT;
+		_length = i;
 
 		return true;
 	}
@@ -33,37 +46,19 @@ bool Core::load(const char* filepath){
 }
 
 void Core::input(uint16_t keys){
-	//edit _keys
+	//Input keys
 }
 
-void Core::update(){
-	//update timers
-
-	//if (_pc < _program_len + ENTRY_POINT)
-	//	operate(_memory[_pc], _memory[_pc + 1]);
+void Core::update(float dt){
+	//Update timers
 }
 
-void Core::render(Screen& screen){
-	screen.drawSprite(0 * 5, 0, _memory, 0x0);
-	screen.drawSprite(1 * 5, 0, _memory, 0x1);
-	screen.drawSprite(2 * 5, 0, _memory, 0x2);
-	screen.drawSprite(3 * 5, 0, _memory, 0x3);
-	screen.drawSprite(4 * 5, 0, _memory, 0x4);
-	screen.drawSprite(5 * 5, 0, _memory, 0x5);
-	screen.drawSprite(6 * 5, 0, _memory, 0x6);
-	screen.drawSprite(7 * 5, 0, _memory, 0x7);
-	screen.drawSprite(0 * 5, 1 * 6, _memory, 0x8);
-	screen.drawSprite(1 * 5, 1 * 6, _memory, 0x9);
-	screen.drawSprite(2 * 5, 1 * 6, _memory, 0xA);
-	screen.drawSprite(3 * 5, 1 * 6, _memory, 0xB);
-	screen.drawSprite(4 * 5, 1 * 6, _memory, 0xC);
-	screen.drawSprite(5 * 5, 1 * 6, _memory, 0xD);
-	screen.drawSprite(6 * 5, 1 * 6, _memory, 0xE);
-	screen.drawSprite(7 * 5, 1 * 6, _memory, 0xF);
+void Core::output(Screen& screen){
+	//Output screen and buzzer
 }
 
 void Core::print(){
-	for (int i = 0; i < MEMORY_SIZE; i++){
+	for (int i = 0; i < sizeof(_memory) / sizeof(uint8_t); i++){
 		if (i % 16 == 0)
 			if (!i)
 				printf("% 5d : ", i);
@@ -76,17 +71,80 @@ void Core::print(){
 	printf("\n");
 }
 
+bool Core::operate(uint8_t lower, uint8_t upper){
+	uint8_t nibbles[4] = { lower >> 4, lower & 0xF, upper >> 4, upper & 0xF };
+	uint16_t tail = (lower << 8) | (upper & 0x0FFF);
+
+	switch (nibbles[0]){
+	case 0x0:
+		switch (upper){
+		case 0xE0: _00E0(); return true;
+		case 0xEE: _00EE(); return true;
+		default: _0NNN(tail); return true;
+		}
+
+	case 0x1: _1NNN(tail); return true;
+	case 0x2: _2NNN(tail); return true;
+	case 0x3: _3XNN(nibbles[1], upper); return true;
+	case 0x4: _4XNN(nibbles[1], upper); return true;
+	case 0x5: _5XY0(nibbles[1], nibbles[2]); return true;
+	case 0x6: _6XNN(nibbles[1], upper); return true;
+	case 0x7: _7XNN(nibbles[1], upper); return true;
+
+	case 0x8:
+		switch (nibbles[3]){
+		case 0x0: _8XY0(nibbles[1], nibbles[2]); return true;
+		case 0x1: _8XY1(nibbles[1], nibbles[2]); return true;
+		case 0x2: _8XY2(nibbles[1], nibbles[2]); return true;
+		case 0x3: _8XY3(nibbles[1], nibbles[2]); return true;
+		case 0x4: _8XY4(nibbles[1], nibbles[2]); return true;
+		case 0x5: _8XY5(nibbles[1], nibbles[2]); return true;
+		case 0x6: _8XY6(nibbles[1], nibbles[2]); return true;
+		case 0x7: _8XY7(nibbles[1], nibbles[2]); return true;
+		case 0xE: _8XYE(nibbles[1], nibbles[2]); return true;
+		default: return false;
+		}
+
+	case 0x9: _9XY0(nibbles[1], nibbles[2]); return true;
+	case 0xA: _ANNN(tail); return true;
+	case 0xB: _BNNN(tail); return true;
+	case 0xC: _CXNN(nibbles[1], upper); return true;
+	case 0xD: _DXYN(nibbles[1], nibbles[2], nibbles[3]); return true;
+
+	case 0xE:
+		switch (upper){
+		case 0x9E: _EX9E(nibbles[1]); return true;
+		case 0xA1: _EXA1(nibbles[1]); return true;
+		default: return false;
+		}
+
+	case 0xF:
+		switch (upper){
+		case 0x07: _FX07(nibbles[1]); return true;
+		case 0x0A: _FX0A(nibbles[1]); return true;
+		case 0x15: _FX15(nibbles[1]); return true;
+		case 0x18: _FX18(nibbles[1]); return true;
+		case 0x1E: _FX1E(nibbles[1]); return true;
+		case 0x29: _FX29(nibbles[1]); return true;
+		case 0x33: _FX33(nibbles[1]); return true;
+		case 0x55: _FX55(nibbles[1]); return true;
+		case 0x65: _FX65(nibbles[1]); return true;
+		default: return false;
+		}
+
+	default:
+		return false;
+	}
+}
+
 void Core::_tick(){
-	//if (ENTRY_POINT <= _pc + 2 && _pc < _program_len + ENTRY_POINT)
-	//	_pc += 2;
+
 }
 
 void Core::_skip(){
-	//if (ENTRY_POINT <= _pc + 4 && _pc + 4 < _program_len + ENTRY_POINT)
-	//	_pc += 4;
+
 }
 
 void Core::_jump(uint16_t& reg, uint16_t val){
-	//if (ENTRY_POINT <= val && val < _program_len + ENTRY_POINT)
-	//	reg = val;
+
 }
