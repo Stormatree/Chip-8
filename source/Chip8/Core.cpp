@@ -6,36 +6,38 @@ Core::Core(){
 }
 
 void Core::reset(){
-	std::fill(_memory, _memory + sizeof(_memory) / sizeof(uint8_t), 0x0);
-	std::fill(_screen, _screen + sizeof(_screen) / sizeof(uint8_t), 0x0);
-	std::fill(_font, _font + sizeof(_font) / sizeof(uint8_t), 0x0);
-	std::fill(_var, _var + sizeof(_var) / sizeof(uint8_t), 0x0);
-	std::fill(_key, _key + sizeof(_key) / sizeof(uint8_t), 0x0);
+	std::fill(_memory, _memory + sizeof(_memory) / sizeof(uint8_t), 0);
 
-	uint16_t _pc = 0;
-	uint16_t _sp = 0;
-	uint16_t _i = 0;
+	std::fill(_buffer, _buffer + sizeof(_buffer) / sizeof(uint8_t), 0);
+	std::fill(_var, _var + sizeof(_var) / sizeof(uint8_t), 0);
+	std::fill(_key, _key + sizeof(_key) / sizeof(uint8_t), 0);
 
-	uint16_t _delay = 0;
-	uint16_t _sound = 0;
+	std::fill(_stack, _stack + sizeof(_stack) / sizeof(uint16_t), 0);
+	
+	_pc = 0;
+	_sp = 0;
+	_i = 0;
 
-	uint16_t _length = 0;
+	_delay = 0;
+	_sound = 0;
 
-	for (int i = 0; i < FONT_LENGTH; i++)
-		_font[i] = Font8x5[i];
+	_length = 0;
+
+	for (int i = 0; i < sizeof(Font4x5) / sizeof(uint8_t); i++)
+		_memory[i] = Font4x5[i];
 }
 
 bool Core::load(const char* filepath){
 	std::ifstream file(filepath, std::fstream::binary);
 
 	if (file){
-		int i = 0;
+		int i = _entryPoint;
 
 		for (; file.peek() != EOF; i++){
 			_memory[i] = file.get();
 		}
 
-		_length = i;
+		_length = i - _entryPoint;
 
 		return true;
 	}
@@ -45,16 +47,73 @@ bool Core::load(const char* filepath){
 	}
 }
 
-void Core::input(uint16_t keys){
-	//Input keys
+// Keymapping
+// 1234	   123C
+// QWER == 456D
+// ASDF == 789E
+// ZXCV	   A0BF
+
+void Core::input(){
+	std::fill(_key, _key + sizeof(_key) / sizeof(uint8_t), 0);
+
+	const uint8_t* keyDown = SDL_GetKeyboardState(0);
+
+	if (keyDown[SDL_SCANCODE_1])
+		_key[0] = 0xFF;
+	if (keyDown[SDL_SCANCODE_2])
+		_key[1] = 0xFF;
+	if (keyDown[SDL_SCANCODE_3])
+		_key[2] = 0xFF;
+	if (keyDown[SDL_SCANCODE_4])
+		_key[3] = 0xFF;
+	if (keyDown[SDL_SCANCODE_Q])
+		_key[4] = 0xFF;
+	if (keyDown[SDL_SCANCODE_W])
+		_key[5] = 0xFF;
+	if (keyDown[SDL_SCANCODE_E])
+		_key[6] = 0xFF;
+	if (keyDown[SDL_SCANCODE_R])
+		_key[7] = 0xFF;
+	if (keyDown[SDL_SCANCODE_A])
+		_key[8] = 0xFF;
+	if (keyDown[SDL_SCANCODE_S])
+		_key[9] = 0xFF;
+	if (keyDown[SDL_SCANCODE_D])
+		_key[10] = 0xFF;
+	if (keyDown[SDL_SCANCODE_F])
+		_key[11] = 0xFF;
+	if (keyDown[SDL_SCANCODE_Z])
+		_key[12] = 0xFF;
+	if (keyDown[SDL_SCANCODE_X])
+		_key[13] = 0xFF;
+	if (keyDown[SDL_SCANCODE_C])
+		_key[14] = 0xFF;
+	if (keyDown[SDL_SCANCODE_V])
+		_key[15] = 0xFF;
 }
 
 void Core::update(float dt){
-	//Update timers
+	//Update timers and pc
+	//printf("%02X%02X", _memory[_pc], _memory[_pc + 1]);
+
+	operate(_memory[_pc], _memory[_pc + 1]);
+	_pc += 2;
+
+	_delay--;
+	_sound--;
+	
+	//printf("Input : %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n", 
+	//	_key[0], _key[1], _key[2], _key[3], _key[4], _key[5], _key[6], _key[7], _key[8], _key[9], _key[10], _key[11], _key[12], _key[13], _key[14], _key[15]);
 }
 
 void Core::output(Screen& screen){
 	//Output screen and buzzer
+	for (int i = 0; i < sizeof(_buffer) / sizeof(uint8_t); i++){
+		if (_buffer[i])
+			screen.feedPixel(true);
+		else
+			screen.feedPixel(false);
+	}
 }
 
 void Core::print(){
@@ -73,14 +132,14 @@ void Core::print(){
 
 bool Core::operate(uint8_t lower, uint8_t upper){
 	uint8_t nibbles[4] = { lower >> 4, lower & 0xF, upper >> 4, upper & 0xF };
-	uint16_t tail = (lower << 8) | (upper & 0x0FFF);
+	uint16_t tail = ((lower << 8) | upper) & 0x0FFF;
 
 	switch (nibbles[0]){
 	case 0x0:
 		switch (upper){
-		case 0xE0: _00E0(); return true;
-		case 0xEE: _00EE(); return true;
-		default: _0NNN(tail); return true;
+			case 0xE0: _00E0(); return true;
+			case 0xEE: _00EE(); return true;
+			default: _0NNN(tail); return true;
 		}
 
 	case 0x1: _1NNN(tail); return true;
@@ -93,16 +152,16 @@ bool Core::operate(uint8_t lower, uint8_t upper){
 
 	case 0x8:
 		switch (nibbles[3]){
-		case 0x0: _8XY0(nibbles[1], nibbles[2]); return true;
-		case 0x1: _8XY1(nibbles[1], nibbles[2]); return true;
-		case 0x2: _8XY2(nibbles[1], nibbles[2]); return true;
-		case 0x3: _8XY3(nibbles[1], nibbles[2]); return true;
-		case 0x4: _8XY4(nibbles[1], nibbles[2]); return true;
-		case 0x5: _8XY5(nibbles[1], nibbles[2]); return true;
-		case 0x6: _8XY6(nibbles[1], nibbles[2]); return true;
-		case 0x7: _8XY7(nibbles[1], nibbles[2]); return true;
-		case 0xE: _8XYE(nibbles[1], nibbles[2]); return true;
-		default: return false;
+			case 0x0: _8XY0(nibbles[1], nibbles[2]); return true;
+			case 0x1: _8XY1(nibbles[1], nibbles[2]); return true;
+			case 0x2: _8XY2(nibbles[1], nibbles[2]); return true;
+			case 0x3: _8XY3(nibbles[1], nibbles[2]); return true;
+			case 0x4: _8XY4(nibbles[1], nibbles[2]); return true;
+			case 0x5: _8XY5(nibbles[1], nibbles[2]); return true;
+			case 0x6: _8XY6(nibbles[1], nibbles[2]); return true;
+			case 0x7: _8XY7(nibbles[1], nibbles[2]); return true;
+			case 0xE: _8XYE(nibbles[1], nibbles[2]); return true;
+			default: return false;
 		}
 
 	case 0x9: _9XY0(nibbles[1], nibbles[2]); return true;
@@ -113,38 +172,26 @@ bool Core::operate(uint8_t lower, uint8_t upper){
 
 	case 0xE:
 		switch (upper){
-		case 0x9E: _EX9E(nibbles[1]); return true;
-		case 0xA1: _EXA1(nibbles[1]); return true;
-		default: return false;
+			case 0x9E: _EX9E(nibbles[1]); return true;
+			case 0xA1: _EXA1(nibbles[1]); return true;
+			default: return false;
 		}
 
 	case 0xF:
 		switch (upper){
-		case 0x07: _FX07(nibbles[1]); return true;
-		case 0x0A: _FX0A(nibbles[1]); return true;
-		case 0x15: _FX15(nibbles[1]); return true;
-		case 0x18: _FX18(nibbles[1]); return true;
-		case 0x1E: _FX1E(nibbles[1]); return true;
-		case 0x29: _FX29(nibbles[1]); return true;
-		case 0x33: _FX33(nibbles[1]); return true;
-		case 0x55: _FX55(nibbles[1]); return true;
-		case 0x65: _FX65(nibbles[1]); return true;
-		default: return false;
+			case 0x07: _FX07(nibbles[1]); return true;
+			case 0x0A: _FX0A(nibbles[1]); return true;
+			case 0x15: _FX15(nibbles[1]); return true;
+			case 0x18: _FX18(nibbles[1]); return true;
+			case 0x1E: _FX1E(nibbles[1]); return true;
+			case 0x29: _FX29(nibbles[1]); return true;
+			case 0x33: _FX33(nibbles[1]); return true;
+			case 0x55: _FX55(nibbles[1]); return true;
+			case 0x65: _FX65(nibbles[1]); return true;
+			default: return false;
 		}
 
 	default:
 		return false;
 	}
-}
-
-void Core::_tick(){
-
-}
-
-void Core::_skip(){
-
-}
-
-void Core::_jump(uint16_t& reg, uint16_t val){
-
 }

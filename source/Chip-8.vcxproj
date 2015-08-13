@@ -51,14 +51,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)build\$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)-$(Configuration)</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
     <IncludePath>$(SolutionDir)middleware\SDL2-2.0.3\include;$(SolutionDir)middleware\SDL2-ttf-2.0.12\include;$(SolutionDir)middleware\SDL2-mixer-2.0.0\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)middleware\SDL2-2.0.3\lib\x86;$(SolutionDir)middleware\SDL2-ttf-2.0.12\lib\x86;$(SolutionDir)middleware\SDL2-mixer-2.0.0\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)build\$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)-$(Configuration)</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
     <IncludePath>$(SolutionDir)middleware\SDL2-2.0.3\include;$(SolutionDir)middleware\SDL2-ttf-2.0.12\include;$(SolutionDir)middleware\SDL2-mixer-2.0.0\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)middleware\SDL2-2.0.3\lib\x86;$(SolutionDir)middleware\SDL2-ttf-2.0.12\lib\x86;$(SolutionDir)middleware\SDL2-mixer-2.0.0\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>

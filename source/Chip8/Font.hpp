@@ -2,9 +2,7 @@
 
 #include <stdint.h>
 
-#define FONT_LENGTH 80
-
-static uint8_t Font8x5[] = {
+static uint8_t Font4x5[] = {
 	//0
 	0xF0,
 	0x90,

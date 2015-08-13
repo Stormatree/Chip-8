@@ -65,6 +65,20 @@ bool Screen::initiate(){
 void Screen::render(){
 	SDL_UpdateWindowSurface(_window);
 	SDL_FillRect(_screen, 0, SDL_MapRGB(_screen->format, (int)round(_rOff * 255), (int)round(_gOff * 255), (int)round(_bOff * 255)));
+
+	_feedX = 0;
+	_feedY = 0;
+}
+
+void Screen::feedPixel(bool fill){
+	drawPixel(_feedX, _feedY, fill);
+
+	_feedX++;
+
+	if (_feedX >= _w){
+		_feedY++;
+		_feedX = 0;
+	}
 }
 
 void Screen::drawPixel(int x, int y, bool fill){

@@ -1,7 +1,7 @@
 #include "Output/Screen.hpp"
 #include "Chip8/Core.hpp"
 
-#define DEFUALT_ROM "../asset/rom/TEST.rom"
+#define DEFUALT_ROM "../asset/rom/TETRIS.rom"
 
 #undef main
 
@@ -28,12 +28,12 @@ int main(int argc, char* argv[]){
 
 	while (running){
 		while (SDL_PollEvent(&e) != 0){
-			if (e.type == SDL_QUIT){
+			if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)){
 				running = false;
 			}
 		}
 
-		emulator.input(0x0000);
+		emulator.input();
 		emulator.update(0.f);
 		emulator.output(screen);
 

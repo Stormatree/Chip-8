@@ -14,6 +14,8 @@ class Screen{
 	SDL_Window* _window;
 	SDL_Surface* _screen;
 
+	int _feedX, _feedY;
+
 public:
 	Screen();
 	~Screen();
@@ -25,6 +27,8 @@ public:
 	void offColour(float r, float g, float b);
 
 	bool initiate();
+
+	void feedPixel(bool fill);
 
 	void drawPixel(int x, int y, bool fill = true);
 	void drawSprite(int x, int y, uint8_t buffer[], int n, int width = 8, int height = 5);

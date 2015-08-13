@@ -5,29 +5,30 @@
 #include "Output/Screen.hpp"
 
 class Core{
-	uint8_t _memory[512];
+	static const uint16_t _entryPoint = 512;
+	uint8_t _memory[2048];
 
-	uint8_t _screen[256];
-	uint8_t _font[80];
+	static const int _bufferHeight = 32;
+	static const int _bufferWidth = 64;
+	uint8_t _buffer[_bufferHeight * _bufferWidth];
+
 	uint8_t _var[16];
 	uint8_t _key[16];
+
+	uint16_t _stack[16];
 
 	uint16_t _pc;
 	uint16_t _sp;
 	uint16_t _i;
 
-	uint16_t _delay;
-	uint16_t _sound;
+	uint8_t _delay;
+	uint8_t _sound;
 
 	uint16_t _length;
 
-	void _tick();
-	void _skip();
-	void _jump(uint16_t& reg, uint16_t val);
-
 	void _00E0();
 	void _00EE();
-	void _0NNN(uint16_t NNN);
+	void _0NNN(uint16_t NNN){} //ignored
 	void _1NNN(uint16_t NNN);
 	void _2NNN(uint16_t NNN);
 	void _3XNN(uint8_t VX, uint8_t NN);
@@ -67,7 +68,7 @@ public:
 	void reset();
 	bool load(const char* filepath);
 
-	void input(uint16_t keys);
+	void input();
 	void update(float dt);
 	void output(Screen& screen);
 
