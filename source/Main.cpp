@@ -2,7 +2,7 @@
 #include "Chip8/Core.hpp"
 #include <iostream>
 
-#define DEFUALT_ROM "../asset/rom/UFO.rom"
+#define DEFUALT_ROM "../asset/rom/FA.rom"
 
 #undef main
 
@@ -22,8 +22,6 @@ int main(int argc, char* argv[]){
 	Screen screen;
 	screen.initiate();
 
-	//600F F029 6040 6120 D015 600A F029 6005 6100 D015
-	
 	// Main loop
 	bool running = true;
 	SDL_Event e;

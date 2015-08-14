@@ -59,13 +59,13 @@ void Core::input(){
 	const uint8_t* keyDown = SDL_GetKeyboardState(0);
 
 	if (keyDown[SDL_SCANCODE_1])
-		_key[0] = 0xFF;
-	if (keyDown[SDL_SCANCODE_2])
 		_key[1] = 0xFF;
-	if (keyDown[SDL_SCANCODE_3])
+	if (keyDown[SDL_SCANCODE_2])
 		_key[2] = 0xFF;
-	if (keyDown[SDL_SCANCODE_4])
+	if (keyDown[SDL_SCANCODE_3])
 		_key[3] = 0xFF;
+	if (keyDown[SDL_SCANCODE_4])
+		_key[0xC] = 0xFF;
 	if (keyDown[SDL_SCANCODE_Q])
 		_key[4] = 0xFF;
 	if (keyDown[SDL_SCANCODE_W])
@@ -73,23 +73,23 @@ void Core::input(){
 	if (keyDown[SDL_SCANCODE_E])
 		_key[6] = 0xFF;
 	if (keyDown[SDL_SCANCODE_R])
-		_key[7] = 0xFF;
+		_key[0xD] = 0xFF;
 	if (keyDown[SDL_SCANCODE_A])
-		_key[8] = 0xFF;
+		_key[7] = 0xFF;
 	if (keyDown[SDL_SCANCODE_S])
-		_key[9] = 0xFF;
+		_key[8] = 0xFF;
 	if (keyDown[SDL_SCANCODE_D])
-		_key[10] = 0xFF;
+		_key[9] = 0xFF;
 	if (keyDown[SDL_SCANCODE_F])
-		_key[11] = 0xFF;
+		_key[0xE] = 0xFF;
 	if (keyDown[SDL_SCANCODE_Z])
-		_key[12] = 0xFF;
+		_key[0xA] = 0xFF;
 	if (keyDown[SDL_SCANCODE_X])
-		_key[13] = 0xFF;
+		_key[0] = 0xFF;
 	if (keyDown[SDL_SCANCODE_C])
-		_key[14] = 0xFF;
+		_key[0xB] = 0xFF;
 	if (keyDown[SDL_SCANCODE_V])
-		_key[15] = 0xFF;
+		_key[0xF] = 0xFF;
 }
 
 void Core::update(float dt){
@@ -143,7 +143,7 @@ bool Core::operate(uint8_t lower, uint8_t upper){
 	switch (nibbles[0]){
 	case 0x0:
 		switch (upper){
-			case 0xE0: _00E0(); return true;
+		case 0xE0: _00E0(); return true;
 			case 0xEE: _00EE(); return true;
 			default: _0NNN(tail); return true;
 		}

@@ -77,12 +77,12 @@ void Core::_8XY3(uint8_t VX, uint8_t VY){
 
 void Core::_8XY4(uint8_t VX, uint8_t VY){
 	// Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
-	if (_var[VX] + _var[VY] >= 0xFF)
+	if (_var[VX] + _var[VY] > 0xFF)
 		_var[0xF] = 1;
 	else
 		_var[0xF] = 0;
 
-	_var[VX] += _var[VY];
+	_var[VX] = _var[VX] + _var[VY];
 }
 
 void Core::_8XY5(uint8_t VX, uint8_t VY){
@@ -92,7 +92,7 @@ void Core::_8XY5(uint8_t VX, uint8_t VY){
 	else
 		_var[0xF] = 0;
 
-	_var[VY] -= _var[VX];
+	_var[VX] -= _var[VY];
 }
 
 void Core::_8XY6(uint8_t VX, uint8_t VY){
@@ -108,7 +108,7 @@ void Core::_8XY7(uint8_t VX, uint8_t VY){
 	else
 		_var[0xF] = 0;
 
-	_var[VY] -= _var[VX];
+	_var[VX] = _var[VY] - _var[VX];
 }
 
 void Core::_8XYE(uint8_t VX, uint8_t VY){
@@ -135,7 +135,7 @@ void Core::_BNNN(uint16_t NNN){
 
 void Core::_CXNN(uint8_t VX, uint8_t NN){
 	// Sets VX to a random number, masked by NN.
-	_var[VX] = (rand() % 0xFF) & NN;
+	_var[VX] = (rand() % 256) & NN;
 }
 
 void Core::_DXYN(uint8_t VX, uint8_t VY, uint8_t N){
@@ -164,13 +164,13 @@ void Core::_DXYN(uint8_t VX, uint8_t VY, uint8_t N){
 
 void Core::_EX9E(uint8_t VX){
 	// Skips the next instruction if the key stored in VX is pressed.
-	if (_var[VX] == 0xFF)
+	if (_key[_var[VX]])
 		_pc += 2;
 }
 
 void Core::_EXA1(uint8_t VX){
 	// Skips the next instruction if the key stored in VX isn't pressed.
-	if (_var[VX] == 0x00)
+	if (!_key[_var[VX]])
 		_pc += 2;
 }
 
@@ -181,12 +181,16 @@ void Core::_FX07(uint8_t VX){
 
 void Core::_FX0A(uint8_t VX){
 	// A key press is awaited, and then stored in VX.
-	bool pressed = false;
+	uint8_t key = 0;
 
-	while (!pressed)
-		for (int i = 0; i < 16; i++)
+	while (!key){
+		for (int i = 0; i < 16; i++){
 			if (_key[i])
-				pressed = true;
+				key = _key[i];
+		}
+	}
+
+	_var[VX] = key;
 }
 
 void Core::_FX15(uint8_t VX){
