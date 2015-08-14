@@ -5,6 +5,8 @@
 #include "Output/Screen.hpp"
 
 class Core{
+	bool _running = true;
+
 	static const uint16_t _entryPoint = 512;
 	uint8_t _memory[2048];
 
@@ -26,6 +28,8 @@ class Core{
 	uint8_t _sound;
 
 	uint16_t _length;
+	
+	Screen _screen;
 
 	void _00E0();
 	void _00EE();
@@ -65,13 +69,15 @@ class Core{
 
 public:
 	Core();
-
+	
 	void reset();
 	bool load(const char* filepath);
 
+	bool running();
+
 	void input();
-	void update(float dt);
-	void output(Screen& screen);
+	void update();
+	void output();
 
 	bool operate(uint8_t lower, uint8_t upper);
 

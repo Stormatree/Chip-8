@@ -2,6 +2,7 @@
 #include "Font.hpp"
 
 Core::Core(){
+	_screen.initiate();
 	reset();
 }
 
@@ -54,6 +55,14 @@ bool Core::load(const char* filepath){
 // ZXCV	   A0BF
 
 void Core::input(){
+	SDL_Event e;
+
+	while (SDL_PollEvent(&e) != 0){
+		if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)){
+			_running = false;
+		}
+	}
+
 	std::fill(_key, _key + sizeof(_key) / sizeof(uint8_t), 0);
 
 	const uint8_t* keyDown = SDL_GetKeyboardState(0);
@@ -92,34 +101,41 @@ void Core::input(){
 		_key[0xF] = 0xFF;
 }
 
-void Core::update(float dt){
-	//Update timers and pc
-	operate(_memory[_pc], _memory[_pc + 1]);
-	_pc += 2;
+void Core::update(){
+	if (_running){
+		//Update timers and pc
+		operate(_memory[_pc], _memory[_pc + 1]);
 
-	_delay--;
-	_sound--;
+		_delay--;
+		_sound--;
 
-	if (_delay > 0)
-		_delay = 0;
+		if (_delay > 0)
+			_delay = 0;
 
-	if (_sound > 0)
-		_sound = 0;
-
-	if (_sound)
-		printf("."); // BEEEP
+		if (_sound > 0)
+			_sound = 0;
+	}
 }
 
-void Core::output(Screen& screen){
+bool Core::running(){
+	return _running;
+}
+
+void Core::output(){
 	//Output screen and buzzer
 	for (int y = 0; y < _bufferHeight; y++){
 		for (int x = 0; x < _bufferWidth; x++){
 			if (_buffer[y * _bufferWidth + x])
-				screen.drawPixel(x, y);
+				_screen.drawPixel(x, y);
 			else
-				screen.drawPixel(x, y, false);
+				_screen.drawPixel(x, y, false);
 		}
 	}
+
+	_screen.render();
+
+	if (_sound)
+		printf("Z"); // BEEEP
 }
 
 void Core::print(){
@@ -139,6 +155,8 @@ void Core::print(){
 bool Core::operate(uint8_t lower, uint8_t upper){
 	uint8_t nibbles[4] = { lower >> 4, lower & 0xF, upper >> 4, upper & 0xF };
 	uint16_t tail = ((lower << 8) | upper) & 0x0FFF;
+
+	_pc += 2;
 
 	switch (nibbles[0]){
 	case 0x0:

@@ -52,7 +52,7 @@ void Core::_6XNN(uint8_t VX, uint8_t NN){
 
 void Core::_7XNN(uint8_t VX, uint8_t NN){
 	// Adds NN to VX.
-	_var[VX] += NN;
+	_var[VX] = _var[VX] + NN;
 }
 
 void Core::_8XY0(uint8_t VX, uint8_t VY){
@@ -92,7 +92,7 @@ void Core::_8XY5(uint8_t VX, uint8_t VY){
 	else
 		_var[0xF] = 0;
 
-	_var[VX] -= _var[VY];
+	_var[VX] = _var[VX] - _var[VY];
 }
 
 void Core::_8XY6(uint8_t VX, uint8_t VY){
@@ -183,7 +183,11 @@ void Core::_FX0A(uint8_t VX){
 	// A key press is awaited, and then stored in VX.
 	uint8_t key = 0;
 
-	while (!key){
+	printf("Waiting for key (0x%02X)\n", VX);
+
+	while (!key && _running){
+		input();
+
 		for (int i = 0; i < 16; i++){
 			if (_key[i])
 				key = _key[i];
@@ -205,7 +209,7 @@ void Core::_FX18(uint8_t VX){
 
 void Core::_FX1E(uint8_t VX){
 	// Adds VX to I.
-	_i += _var[VX];
+	_i = _i + _var[VX];
 }
 
 void Core::_FX29(uint8_t VX){
