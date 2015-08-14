@@ -1,18 +1,18 @@
 #include "Output/Screen.hpp"
 #include "Chip8/Core.hpp"
+#include <iostream>
 
-#define DEFUALT_ROM "../asset/rom/TETRIS.rom"
+#define DEFUALT_ROM "../asset/rom/UFO.rom"
 
 #undef main
 
 int main(int argc, char* argv[]){
-	// Emulator setup
+	// Emulator setup and loading ROM
 	Core emulator;
 
-	if (argc > 1 && emulator.load(argv[1])) // Load from args
+	// Loading from arg, if not, then default
+	if (argc > 1 && emulator.load(argv[1]))
 		emulator.print();
-	else if (argc > 1)
-		return 1;
 	else if (emulator.load(DEFUALT_ROM))
 		emulator.print();
 	else
@@ -22,6 +22,8 @@ int main(int argc, char* argv[]){
 	Screen screen;
 	screen.initiate();
 
+	//600F F029 6040 6120 D015 600A F029 6005 6100 D015
+	
 	// Main loop
 	bool running = true;
 	SDL_Event e;
@@ -30,6 +32,7 @@ int main(int argc, char* argv[]){
 		while (SDL_PollEvent(&e) != 0){
 			if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)){
 				running = false;
+				return 0;
 			}
 		}
 

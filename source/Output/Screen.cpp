@@ -3,14 +3,10 @@
 #include "Screen.hpp"
 
 Screen::Screen(){
-	_title = "Chip-8 Emulator";
-
-	size(1024, 512);
-
-	pixels(64, 32);
-
-	offColour(0.f, 0.f, 0.f);
-	onColour(1.f, 1.f, 1.f);
+	setTitle("Chip-8 Emulator");
+	setSize(1024, 512);
+	setPixels(64, 32);
+	setColour(0.f, 0.f, 0.f, 1.f, 1.f, 1.f);
 }
 
 Screen::~Screen(){
@@ -18,30 +14,28 @@ Screen::~Screen(){
 	SDL_DestroyWindow(_window);
 }
 
-void Screen::title(const char* title){
+void Screen::setTitle(const char* title){
 	_title = title;
 }
 
-void Screen::size(int width, int height){
+void Screen::setSize(int width, int height){
 	_w = width;
 	_h = height;
 }
 
-void Screen::pixels(int width, int height){
+void Screen::setPixels(int width, int height){
 	_x = width;
 	_y = height;
 }
 
-void Screen::onColour(float r, float g, float b){
-	_rOn = r;
-	_gOn = g;
-	_bOn = b;
-}
+void Screen::setColour(float rOff, float gOff, float bOff, float rOn, float gOn, float bOn){
+	_rOff = rOff;
+	_gOff = gOff;
+	_bOff = bOff;
 
-void Screen::offColour(float r, float g, float b){
-	_rOff = r;
-	_gOff = g;
-	_bOff = b;
+	_rOn = rOn;
+	_gOn = gOn;
+	_bOn = bOn;
 }
 
 bool Screen::initiate(){
@@ -59,26 +53,14 @@ bool Screen::initiate(){
 
 	_screen = SDL_GetWindowSurface(_window);
 
+	render();
+
 	return true;
 }
 
 void Screen::render(){
 	SDL_UpdateWindowSurface(_window);
 	SDL_FillRect(_screen, 0, SDL_MapRGB(_screen->format, (int)round(_rOff * 255), (int)round(_gOff * 255), (int)round(_bOff * 255)));
-
-	_feedX = 0;
-	_feedY = 0;
-}
-
-void Screen::feedPixel(bool fill){
-	drawPixel(_feedX, _feedY, fill);
-
-	_feedX++;
-
-	if (_feedX >= _w){
-		_feedY++;
-		_feedX = 0;
-	}
 }
 
 void Screen::drawPixel(int x, int y, bool fill){
@@ -89,29 +71,13 @@ void Screen::drawPixel(int x, int y, bool fill){
 		(_h / _y)
 	};
 
-	if (fill){
+	if (fill)
 		SDL_FillRect(_screen, &pixel, SDL_MapRGB(_screen->format, (int)round(_rOn * 255), (int)round(_gOn * 255), (int)round(_bOn * 255)));
-	}
-	else{
+	else
 		SDL_FillRect(_screen, &pixel, SDL_MapRGB(_screen->format, (int)round(_rOff * 255), (int)round(_gOff * 255), (int)round(_bOff * 255)));
-	}
 }
 
 void Screen::drawSurface(int x, int y, SDL_Surface* surface){
 	SDL_Rect dest = { x, y, surface->w, surface->h };
 	SDL_BlitSurface(surface, 0, _screen, &dest);
-}
-
-void Screen::drawSprite(int x, int y, uint8_t buffer[], int n, int width, int height){
-	for (int dy = 0; dy < height; dy++){
-		uint8_t line = buffer[dy + (n * height)];
-		uint8_t mask = (uint8_t)pow(2.f, width - 1);
-
-		for (int dx = 0; dx < width; dx++){
-			if (line & mask)
-				drawPixel(x + dx, y + dy);
-
-			mask >>= 1;
-		}
-	}
 }

@@ -18,8 +18,9 @@ class Core{
 	uint16_t _stack[16];
 
 	uint16_t _pc;
-	uint16_t _sp;
 	uint16_t _i;
+
+	uint8_t _sp;
 
 	uint8_t _delay;
 	uint8_t _sound;

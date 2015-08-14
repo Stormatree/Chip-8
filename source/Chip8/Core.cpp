@@ -8,13 +8,13 @@ Core::Core(){
 void Core::reset(){
 	std::fill(_memory, _memory + sizeof(_memory) / sizeof(uint8_t), 0);
 
-	std::fill(_buffer, _buffer + sizeof(_buffer) / sizeof(uint8_t), 0);
+	std::fill(_buffer, _buffer + _bufferWidth * _bufferHeight, 0);
 	std::fill(_var, _var + sizeof(_var) / sizeof(uint8_t), 0);
 	std::fill(_key, _key + sizeof(_key) / sizeof(uint8_t), 0);
 
 	std::fill(_stack, _stack + sizeof(_stack) / sizeof(uint16_t), 0);
 	
-	_pc = 0;
+	_pc = _entryPoint;
 	_sp = 0;
 	_i = 0;
 
@@ -94,25 +94,31 @@ void Core::input(){
 
 void Core::update(float dt){
 	//Update timers and pc
-	//printf("%02X%02X", _memory[_pc], _memory[_pc + 1]);
-
 	operate(_memory[_pc], _memory[_pc + 1]);
 	_pc += 2;
 
 	_delay--;
 	_sound--;
-	
-	//printf("Input : %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n", 
-	//	_key[0], _key[1], _key[2], _key[3], _key[4], _key[5], _key[6], _key[7], _key[8], _key[9], _key[10], _key[11], _key[12], _key[13], _key[14], _key[15]);
+
+	if (_delay > 0)
+		_delay = 0;
+
+	if (_sound > 0)
+		_sound = 0;
+
+	if (_sound)
+		printf("."); // BEEEP
 }
 
 void Core::output(Screen& screen){
 	//Output screen and buzzer
-	for (int i = 0; i < sizeof(_buffer) / sizeof(uint8_t); i++){
-		if (_buffer[i])
-			screen.feedPixel(true);
-		else
-			screen.feedPixel(false);
+	for (int y = 0; y < _bufferHeight; y++){
+		for (int x = 0; x < _bufferWidth; x++){
+			if (_buffer[y * _bufferWidth + x])
+				screen.drawPixel(x, y);
+			else
+				screen.drawPixel(x, y, false);
+		}
 	}
 }
 

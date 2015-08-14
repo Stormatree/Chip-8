@@ -14,24 +14,18 @@ class Screen{
 	SDL_Window* _window;
 	SDL_Surface* _screen;
 
-	int _feedX, _feedY;
-
 public:
 	Screen();
 	~Screen();
 
-	void title(const char* title);
-	void size(int width, int height);
-	void pixels(int width, int height);
-	void onColour(float r, float g, float b);
-	void offColour(float r, float g, float b);
+	void setTitle(const char* title);
+	void setSize(int width, int height);
+	void setPixels(int width, int height);
+	void setColour(float rOff, float gOff, float bOff, float rOn, float gOn, float bOn);
 
 	bool initiate();
 
-	void feedPixel(bool fill);
-
 	void drawPixel(int x, int y, bool fill = true);
-	void drawSprite(int x, int y, uint8_t buffer[], int n, int width = 8, int height = 5);
 	void drawSurface(int x, int y, SDL_Surface* surface);
 
 	void render();
