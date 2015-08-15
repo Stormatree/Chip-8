@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[]){
 	// Emulator setup and loading ROM
-	Core emulator;
+	Core emulator(argv[0]);
 
 	// Loading from arg, if not, then default
 	if (argc > 1 && emulator.load(argv[1]))
@@ -15,6 +15,8 @@ int main(int argc, char* argv[]){
 		emulator.print();
 	else
 		return 1;
+
+	emulator.screen().setColour(9, 18, 3, 53, 232, 13);
 
 	while (emulator.running()){
 		emulator.input();

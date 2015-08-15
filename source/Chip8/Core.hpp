@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <fstream>
 #include "Output/Screen.hpp"
+#include <SDL.h>
+#include <SDL_mixer.h>
+#include <string>
 
 class Core{
 	bool _running = true;
@@ -30,6 +33,8 @@ class Core{
 	uint16_t _length;
 	
 	Screen _screen;
+
+	Mix_Music* _tone = 0;
 
 	void _00E0();
 	void _00EE();
@@ -68,7 +73,8 @@ class Core{
 	void _FX65(uint8_t VX);
 
 public:
-	Core();
+	Core(std::string location);
+	~Core();
 	
 	void reset();
 	bool load(const char* filepath);
@@ -80,6 +86,8 @@ public:
 	void output();
 
 	bool operate(uint8_t lower, uint8_t upper);
+
+	Screen& screen();
 
 	void print();
 };

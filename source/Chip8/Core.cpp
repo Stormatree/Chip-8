@@ -1,9 +1,30 @@
 #include "Core.hpp"
 #include "Font.hpp"
+#include <stdio.h> 
 
-Core::Core(){
+Core::Core(std::string location){
 	_screen.initiate();
 	reset();
+
+	Mix_Init(MIX_INIT_OGG);
+
+	Mix_OpenAudio(44100, AUDIO_S16SYS, 1, 4096);
+
+	location = location.substr(0, location.find_last_of("\\") + 1);
+
+	_tone = Mix_LoadMUS((location + "..\\asset\\squarewave.ogg").c_str());
+
+	if (!_tone)
+		printf("Audio disabled. %s\n", Mix_GetError());
+
+	if (_tone){
+		Mix_PlayMusic(_tone, -1);
+		Mix_PauseMusic();
+	}
+}
+
+Core::~Core(){
+	Mix_FreeMusic(_tone);
 }
 
 void Core::reset(){
@@ -47,6 +68,10 @@ bool Core::load(const char* filepath){
 		printf("No such file '%s'!\n", filepath);
 		return false;
 	}
+}
+
+Screen& Core::screen(){
+	return _screen;
 }
 
 // Keymapping
@@ -105,16 +130,16 @@ void Core::input(){
 void Core::update(){
 	if (_running){
 		//Update timers and pc
-		operate(_memory[_pc], _memory[_pc + 1]);
-
-		_delay--;
-		_sound--;
+		if (_pc <= _entryPoint + _length)
+			operate(_memory[_pc], _memory[_pc + 1]);
+		else
+			_running = false;
 
 		if (_delay > 0)
-			_delay = 0;
+			_delay--;
 
 		if (_sound > 0)
-			_sound = 0;
+			_sound--;
 	}
 }
 
@@ -135,8 +160,12 @@ void Core::output(){
 
 	_screen.render();
 
-	if (_sound)
-		printf("Z"); // BEEEP
+	if (_tone){
+		if (_sound != 0)
+			Mix_ResumeMusic();
+		else
+			Mix_PauseMusic();
+	}
 }
 
 void Core::print(){

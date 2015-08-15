@@ -17,7 +17,6 @@ void Core::_00EE(){
 	// Returns from a subroutine.
 	_sp--;
 	_pc = _stack[_sp];
-	//_stack[_sp] = 0;
 }
 
 void Core::_1NNN(uint16_t NNN){
@@ -120,9 +119,6 @@ void Core::_8XYE(uint8_t VX, uint8_t VY){
 	// Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
 	_var[0xF] = (_var[VX] >> 7) & 0x01;
 	_var[VX] = _var[VX] << 1;
-
-	//_var[0xF] = (_var[0xF] & 0x80) << 7;
-	//_var[VX] = _var[VX] << 1;
 }
 
 void Core::_9XY0(uint8_t VX, uint8_t VY){
@@ -148,35 +144,22 @@ void Core::_CXNN(uint8_t VX, uint8_t NN){
 
 void Core::_DXYN(uint8_t VX, uint8_t VY, uint8_t N){
 	// Sprites stored in memory at location in index register (I), maximum 8bits wide. Wraps around the screen. If when drawn, clears a pixel, register VF is set to 1 otherwise it is zero.
-	uint16_t start = _i;
-	int y = 0;
+	_var[0xF] = 0;
 
-	for (; _i - start < N; _i++){
-		std::bitset<8> bits(_memory[_i]);
-		
-		for (int x = 0; x < 8; x++){
-			//if (_buffer[(_var[VY] + y) % _bufferHeight][(_var[VX] + x) % _bufferWidth] && bits.at(7 - x))
-			//	_var[0xF] = 1;
-			//else
-			//	_var[0xF] = 0;
-			//
-			//if (bits.at(7 - x))
-			//	_buffer[(_var[VY] + y) % _bufferHeight][(_var[VX] + x) % _bufferWidth] = 0xFF;
-			//else
-			//	_buffer[(_var[VY] + y) % _bufferHeight][(_var[VX] + x) % _bufferWidth] = 0x00;
+	for (uint8_t y = 0; y < N; y++){
+		uint8_t line = _memory[_i + y];
 
-			uint8_t pixel = _buffer[(_var[VY] + y) % _bufferHeight][(_var[VX] + x) % _bufferWidth];
-			pixel = pixel ^ bits.at(7 - x);
+		for (uint8_t x = 0; x < 8; x++){
+			if (line & (0x80 >> x)){
+				uint8_t posX = (_var[VX] + x) % _bufferWidth;
+				uint8_t posY = (_var[VY] + y) % _bufferHeight;
 
-			if (_buffer[(_var[VY] + y) % _bufferHeight][(_var[VX] + x) % _bufferWidth] == 1 && pixel == 0)
-				_var[0xF] = 1;
-			else
-				_var[0xF] = 0;
+				if (_buffer[posY][posX] != 0)
+					_var[0xF] = 1;
 
-			_buffer[(_var[VY] + y) % _bufferHeight][(_var[VX] + x) % _bufferWidth] = pixel;
+				_buffer[posY][posX] ^= 1;
+			}
 		}
-
-		y++;
 	}
 }
 
@@ -208,8 +191,7 @@ void Core::_FX0A(uint8_t VX){
 		}
 	}
 
-	/*
-	uint8_t key = 0;
+	/*uint8_t key = 0;
 
 	printf("Waiting for key (0x%02X)\n", VX);
 

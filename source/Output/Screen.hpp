@@ -21,7 +21,7 @@ public:
 	void setTitle(const char* title);
 	void setSize(int width, int height);
 	void setPixels(int width, int height);
-	void setColour(float rOff, float gOff, float bOff, float rOn, float gOn, float bOn);
+	void setColour(int rOff, int gOff, int bOff, int rOn, int gOn, int bOn);
 
 	bool initiate();
 

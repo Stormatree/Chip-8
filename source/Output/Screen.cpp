@@ -6,7 +6,7 @@ Screen::Screen(){
 	setTitle("Chip-8 Emulator");
 	setSize(1024, 512);
 	setPixels(64, 32);
-	setColour(0.f, 0.f, 0.f, 1.f, 1.f, 1.f);
+	setColour(0, 0, 0, 255, 255, 255);
 }
 
 Screen::~Screen(){
@@ -28,14 +28,14 @@ void Screen::setPixels(int width, int height){
 	_y = height;
 }
 
-void Screen::setColour(float rOff, float gOff, float bOff, float rOn, float gOn, float bOn){
-	_rOff = rOff;
-	_gOff = gOff;
-	_bOff = bOff;
+void Screen::setColour(int rOff, int gOff, int bOff, int rOn, int gOn, int bOn){
+	_rOff = rOff / (float)255;
+	_gOff = gOff / (float)255;
+	_bOff = bOff / (float)255;
 
-	_rOn = rOn;
-	_gOn = gOn;
-	_bOn = bOn;
+	_rOn = rOn / (float)255;
+	_gOn = gOn / (float)255;
+	_bOn = bOn / (float)255;
 }
 
 bool Screen::initiate(){
