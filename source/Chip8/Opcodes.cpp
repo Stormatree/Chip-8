@@ -6,14 +6,18 @@
 
 void Core::_00E0(){
 	// Clears the screen.
-	std::fill(_buffer, _buffer + _bufferWidth * _bufferHeight, 0);
+	for (int y = 0; y < _bufferHeight; y++){
+		for (int x = 0; x < _bufferWidth; x++){
+			_buffer[y][x] = 0;
+		}
+	}
 }
 
 void Core::_00EE(){
 	// Returns from a subroutine.
 	_sp--;
 	_pc = _stack[_sp];
-	_stack[_sp] = 0;
+	//_stack[_sp] = 0;
 }
 
 void Core::_1NNN(uint16_t NNN){
@@ -25,6 +29,7 @@ void Core::_2NNN(uint16_t NNN){
 	// Calls subroutine at NNN.
 	_stack[_sp] = _pc;
 	_sp++;
+	_pc = NNN;
 }
 
 void Core::_3XNN(uint8_t VX, uint8_t NN){
@@ -87,7 +92,7 @@ void Core::_8XY4(uint8_t VX, uint8_t VY){
 
 void Core::_8XY5(uint8_t VX, uint8_t VY){
 	// VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
-	if (_var[VX] > _var[VY])
+	if (_var[VX] >= _var[VY])
 		_var[0xF] = 1;
 	else
 		_var[0xF] = 0;
@@ -103,7 +108,7 @@ void Core::_8XY6(uint8_t VX, uint8_t VY){
 
 void Core::_8XY7(uint8_t VX, uint8_t VY){
 	// Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
-	if (_var[VX] < _var[VY])
+	if (_var[VX] <= _var[VY])
 		_var[0xF] = 1;
 	else
 		_var[0xF] = 0;
@@ -113,8 +118,11 @@ void Core::_8XY7(uint8_t VX, uint8_t VY){
 
 void Core::_8XYE(uint8_t VX, uint8_t VY){
 	// Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
-	_var[0xF] = (_var[0xF] & 0x80) << 7;
+	_var[0xF] = (_var[VX] >> 7) & 0x01;
 	_var[VX] = _var[VX] << 1;
+
+	//_var[0xF] = (_var[0xF] & 0x80) << 7;
+	//_var[VX] = _var[VX] << 1;
 }
 
 void Core::_9XY0(uint8_t VX, uint8_t VY){
@@ -135,30 +143,40 @@ void Core::_BNNN(uint16_t NNN){
 
 void Core::_CXNN(uint8_t VX, uint8_t NN){
 	// Sets VX to a random number, masked by NN.
-	_var[VX] = (rand() % 256) & NN;
+	_var[VX] = (rand() % 255) & NN;
 }
 
 void Core::_DXYN(uint8_t VX, uint8_t VY, uint8_t N){
 	// Sprites stored in memory at location in index register (I), maximum 8bits wide. Wraps around the screen. If when drawn, clears a pixel, register VF is set to 1 otherwise it is zero.
 	uint16_t start = _i;
-	int position = _var[VY] * _bufferWidth + _var[VX];
-		
+	int y = 0;
+
 	for (; _i - start < N; _i++){
 		std::bitset<8> bits(_memory[_i]);
 		
 		for (int x = 0; x < 8; x++){
-			if (_buffer[(position % (_bufferWidth * (_bufferHeight + 1))) + ((7 - x) % _bufferWidth)] && bits.at(x))
+			//if (_buffer[(_var[VY] + y) % _bufferHeight][(_var[VX] + x) % _bufferWidth] && bits.at(7 - x))
+			//	_var[0xF] = 1;
+			//else
+			//	_var[0xF] = 0;
+			//
+			//if (bits.at(7 - x))
+			//	_buffer[(_var[VY] + y) % _bufferHeight][(_var[VX] + x) % _bufferWidth] = 0xFF;
+			//else
+			//	_buffer[(_var[VY] + y) % _bufferHeight][(_var[VX] + x) % _bufferWidth] = 0x00;
+
+			uint8_t pixel = _buffer[(_var[VY] + y) % _bufferHeight][(_var[VX] + x) % _bufferWidth];
+			pixel = pixel ^ bits.at(7 - x);
+
+			if (_buffer[(_var[VY] + y) % _bufferHeight][(_var[VX] + x) % _bufferWidth] == 1 && pixel == 0)
 				_var[0xF] = 1;
 			else
 				_var[0xF] = 0;
 
-			if (bits.at(x))
-				_buffer[(position % (_bufferWidth * (_bufferHeight + 1))) + ((7 - x) % _bufferWidth)] = 0xFF;
-			else
-				_buffer[(position % (_bufferWidth * (_bufferHeight + 1))) + ((7 - x) % _bufferWidth)] = 0x00;
+			_buffer[(_var[VY] + y) % _bufferHeight][(_var[VX] + x) % _bufferWidth] = pixel;
 		}
 
-		position += _bufferWidth;
+		y++;
 	}
 }
 
@@ -181,6 +199,16 @@ void Core::_FX07(uint8_t VX){
 
 void Core::_FX0A(uint8_t VX){
 	// A key press is awaited, and then stored in VX.
+	_pc -= 2;
+
+	for (int i = 0; i < 16; i++){
+		if (_key[i]){
+			_var[VX] = _key[i];
+			_pc += 2;
+		}
+	}
+
+	/*
 	uint8_t key = 0;
 
 	printf("Waiting for key (0x%02X)\n", VX);
@@ -194,7 +222,7 @@ void Core::_FX0A(uint8_t VX){
 		}
 	}
 
-	_var[VX] = key;
+	_var[VX] = key;*/
 }
 
 void Core::_FX15(uint8_t VX){

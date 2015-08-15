@@ -1,5 +1,4 @@
 #include "Chip8/Core.hpp"
-#include <iostream>
 
 #define DEFUALT_ROM "../asset/rom/MAZE.rom"
 

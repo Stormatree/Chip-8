@@ -9,9 +9,10 @@ Core::Core(){
 void Core::reset(){
 	std::fill(_memory, _memory + sizeof(_memory) / sizeof(uint8_t), 0);
 
-	std::fill(_buffer, _buffer + _bufferWidth * _bufferHeight, 0);
 	std::fill(_var, _var + sizeof(_var) / sizeof(uint8_t), 0);
 	std::fill(_key, _key + sizeof(_key) / sizeof(uint8_t), 0);
+
+	_00E0(); // Clear the screen
 
 	std::fill(_stack, _stack + sizeof(_stack) / sizeof(uint16_t), 0);
 	
@@ -125,7 +126,7 @@ void Core::output(){
 	//Output screen and buzzer
 	for (int y = 0; y < _bufferHeight; y++){
 		for (int x = 0; x < _bufferWidth; x++){
-			if (_buffer[y * _bufferWidth + x])
+			if (_buffer[y][x])
 				_screen.drawPixel(x, y);
 			else
 				_screen.drawPixel(x, y, false);
@@ -214,8 +215,9 @@ bool Core::operate(uint8_t lower, uint8_t upper){
 			case 0x65: _FX65(nibbles[1]); return true;
 			default: return false;
 		}
-
-	default:
-		return false;
 	}
+
+
+	printf("%02X%02X\n", upper, lower);
+	return false;
 }

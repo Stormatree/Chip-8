@@ -8,11 +8,11 @@ class Core{
 	bool _running = true;
 
 	static const uint16_t _entryPoint = 512;
-	uint8_t _memory[2048];
+	uint8_t _memory[4096];
 
 	static const int _bufferHeight = 32;
 	static const int _bufferWidth = 64;
-	uint8_t _buffer[_bufferHeight * _bufferWidth];
+	uint8_t _buffer[_bufferHeight][_bufferWidth];
 
 	uint8_t _var[16];
 	uint8_t _key[16];
