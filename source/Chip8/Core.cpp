@@ -2,7 +2,7 @@
 #include "Font.hpp"
 #include <stdio.h> 
 
-Core::Core(std::string location){
+Core::Core(std::string exeLocation){
 	_screen.initiate();
 	reset();
 
@@ -10,9 +10,9 @@ Core::Core(std::string location){
 
 	Mix_OpenAudio(44100, AUDIO_S16SYS, 1, 4096);
 
-	location = location.substr(0, location.find_last_of("\\") + 1);
+	exeLocation = exeLocation.substr(0, exeLocation.find_last_of("\\") + 1);
 
-	_tone = Mix_LoadMUS((location + "..\\asset\\squarewave.ogg").c_str());
+	_tone = Mix_LoadMUS((exeLocation + "..\\asset\\squarewave.ogg").c_str());
 
 	if (!_tone)
 		printf("Audio disabled. %s\n", Mix_GetError());

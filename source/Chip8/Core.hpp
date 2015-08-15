@@ -73,7 +73,7 @@ class Core{
 	void _FX65(uint8_t VX);
 
 public:
-	Core(std::string location);
+	Core(std::string exeLocation = "");
 	~Core();
 	
 	void reset();
