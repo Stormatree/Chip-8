@@ -1,29 +1,32 @@
-## Chip-8 Emulator
-A C++ Chip-8 emulator. Currently super sketchy, and produces mostly garbage.  
+# Chip-8 Emulator
+<img src="http://i.imgur.com/pOhTWvb.gif">
+
+# Description
+A C++ Chip-8 emulator. Mostly working, but really rough around the edges.  
   
-## Supported ROMs
-Game     |Support
+# Supported ROMs
+ROM      |Support
 ---------|-------------
-WIPEOFF  |  **Working**
-VERS     |  **Working**
+WIPEOFF  |  Working
+VERS     |  Working
 VBRIX    |  Partially  
-UFO      |  **Working**
+UFO      |  Working
 TICTAC   |  Partially  
-TETRIS   |  **Working**
-TANK     |  **Working**
+TETRIS   |  Working
+TANK     |  Working
 SYZYGY   |  Partially  
 PUZZLE   |  Partially  
-PONG2    |  **Working**
-PONG     |  **Working**
-MISSILE  |  **Working**
+PONG2    |  Working
+PONG     |  Working
+MISSILE  |  Working
 MERLIN   |  Partially  
-MAZE     |  **Working**
+MAZE     |  Working
 KALEID   |  Broken     
-INVADERS |  **Working**
+INVADERS |  Working
 HIDDEN   |  Partially  
-GUESS    |  **Working**
+GUESS    |  Working
 CONNECT4 |  Partially  
-BRIX     |  **Working**
+BRIX     |  Working
 BLITZ    |  Partially  
-BLINKY   |  **Working**
-15PUZZLE |  **Working**
+BLINKY   |  Working
+15PUZZLE |  Working

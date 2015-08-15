@@ -11,31 +11,33 @@ class Core{
 	bool _running = true;
 
 	static const uint16_t _entryPoint = 512;
-	uint8_t _memory[4096];
 
 	static const int _bufferHeight = 32;
 	static const int _bufferWidth = 64;
-	uint8_t _buffer[_bufferHeight][_bufferWidth];
 
+	// Memory Containers
+	uint8_t _memory[4096];
+	uint8_t _buffer[_bufferHeight][_bufferWidth];
 	uint8_t _var[16];
 	uint8_t _key[16];
-
 	uint16_t _stack[16];
 
+	// Private Registers
 	uint16_t _pc;
 	uint16_t _i;
-
 	uint8_t _sp;
 
+	// Timers
 	uint8_t _delay;
 	uint8_t _sound;
 
-	uint16_t _length;
+	uint16_t _programLength;
 	
+	// Outputs
 	Screen _screen;
-
 	Mix_Music* _tone = 0;
 
+	// Opcodes
 	void _00E0();
 	void _00EE();
 	void _0NNN(uint16_t NNN){} //ignored
@@ -73,21 +75,29 @@ class Core{
 	void _FX65(uint8_t VX);
 
 public:
+	// Takes in location of chip-8.exe for asset reference
 	Core(std::string exeLocation = "");
 	~Core();
 	
+	// Resets all CPU parameters to default
 	void reset();
+	// Loads rom into memory
 	bool load(const char* filepath);
 
+	// Return if core is running
 	bool running();
 
+	// Game states
 	void input();
 	void update();
 	void output();
 
+	// Perform an opcode, returns true if valid
 	bool operate(uint8_t lower, uint8_t upper);
 
+	// Get screen object for setting parameters
 	Screen& screen();
 
+	// Print memory to console (Debug only)
 	void print();
 };

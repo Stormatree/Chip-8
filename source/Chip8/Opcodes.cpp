@@ -1,5 +1,4 @@
 #include "Core.hpp"
-#include <bitset>
 
 // Names and descriptions sourced from CHIP-8 Wikipedia article
 // http://en.wikipedia.org/wiki/CHIP-8
@@ -190,21 +189,6 @@ void Core::_FX0A(uint8_t VX){
 			_pc += 2;
 		}
 	}
-
-	/*uint8_t key = 0;
-
-	printf("Waiting for key (0x%02X)\n", VX);
-
-	while (!key && _running){
-		input();
-
-		for (int i = 0; i < 16; i++){
-			if (_key[i])
-				key = _key[i];
-		}
-	}
-
-	_var[VX] = key;*/
 }
 
 void Core::_FX15(uint8_t VX){
@@ -214,7 +198,7 @@ void Core::_FX15(uint8_t VX){
 
 void Core::_FX18(uint8_t VX){
 	// Sets the sound timer to VX.
-	_sound = _var[VX];
+	_sound = _var[VX] + 32;
 }
 
 void Core::_FX1E(uint8_t VX){

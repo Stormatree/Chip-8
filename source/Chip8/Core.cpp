@@ -1,22 +1,27 @@
 #include "Core.hpp"
 #include "Font.hpp"
-#include <stdio.h> 
 
 Core::Core(std::string exeLocation){
+	// Start screen, and reset core
 	_screen.initiate();
 	reset();
 
+	// Init audio, and load squarewave tone
 	Mix_Init(MIX_INIT_OGG);
 
 	Mix_OpenAudio(44100, AUDIO_S16SYS, 1, 4096);
 
+	// Using a relative location from the exe path
 	exeLocation = exeLocation.substr(0, exeLocation.find_last_of("\\") + 1);
 
 	_tone = Mix_LoadMUS((exeLocation + "..\\asset\\squarewave.ogg").c_str());
 
+#ifdef _DEBUG
 	if (!_tone)
 		printf("Audio disabled. %s\n", Mix_GetError());
+#endif
 
+	// Start and pause tone
 	if (_tone){
 		Mix_PlayMusic(_tone, -1);
 		Mix_PauseMusic();
@@ -28,6 +33,7 @@ Core::~Core(){
 }
 
 void Core::reset(){
+	// Fill containers with 0x00
 	std::fill(_memory, _memory + sizeof(_memory) / sizeof(uint8_t), 0);
 
 	std::fill(_var, _var + sizeof(_var) / sizeof(uint8_t), 0);
@@ -37,6 +43,7 @@ void Core::reset(){
 
 	std::fill(_stack, _stack + sizeof(_stack) / sizeof(uint16_t), 0);
 	
+	// Reset to default paramaters
 	_pc = _entryPoint;
 	_sp = 0;
 	_i = 0;
@@ -44,15 +51,18 @@ void Core::reset(){
 	_delay = 0;
 	_sound = 0;
 
-	_length = 0;
+	_programLength = 0;
 
+	// Load font into memory
 	for (int i = 0; i < sizeof(Font4x5) / sizeof(uint8_t); i++)
 		_memory[i] = Font4x5[i];
 }
 
 bool Core::load(const char* filepath){
+	// Load file
 	std::ifstream file(filepath, std::fstream::binary);
 
+	// Read bytecode into memory
 	if (file){
 		int i = _entryPoint;
 
@@ -60,18 +70,24 @@ bool Core::load(const char* filepath){
 			_memory[i] = file.get();
 		}
 
-		_length = i - _entryPoint;
+		_programLength = i - _entryPoint;
 
 		return true;
 	}
 	else{
+#ifdef _DEBUG
 		printf("No such file '%s'!\n", filepath);
+#endif
 		return false;
 	}
 }
 
 Screen& Core::screen(){
 	return _screen;
+}
+
+bool Core::running(){
+	return _running;
 }
 
 // Keymapping
@@ -81,6 +97,7 @@ Screen& Core::screen(){
 // ZXCV	   A0BF
 
 void Core::input(){
+	// Update SDL events
 	SDL_Event e;
 
 	while (SDL_PollEvent(&e) != 0){
@@ -89,8 +106,10 @@ void Core::input(){
 		}
 	}
 
+	// Reset all keys to up
 	std::fill(_key, _key + sizeof(_key) / sizeof(uint8_t), 0);
 
+	// Get keys currently down
 	const uint8_t* keyDown = SDL_GetKeyboardState(0);
 
 	if (keyDown[SDL_SCANCODE_1])
@@ -129,26 +148,24 @@ void Core::input(){
 
 void Core::update(){
 	if (_running){
-		//Update timers and pc
-		if (_pc <= _entryPoint + _length)
-			operate(_memory[_pc], _memory[_pc + 1]);
-		else
-			_running = false;
-
+		// If running, update timers
 		if (_delay > 0)
 			_delay--;
 
 		if (_sound > 0)
 			_sound--;
+
+		// If PC is still within the program, perform opcode
+		if (_pc <= _entryPoint + _programLength)
+			operate(_memory[_pc], _memory[_pc + 1]);
+		else
+			// Otherwise stop running
+			_running = false;
 	}
 }
 
-bool Core::running(){
-	return _running;
-}
-
 void Core::output(){
-	//Output screen and buzzer
+	// Transfer pixels from buffer to screen
 	for (int y = 0; y < _bufferHeight; y++){
 		for (int x = 0; x < _bufferWidth; x++){
 			if (_buffer[y][x])
@@ -158,17 +175,20 @@ void Core::output(){
 		}
 	}
 
+	// Update screen
 	_screen.render();
 
+	// Play or stop tone depending on sound timer
 	if (_tone){
 		if (_sound != 0)
 			Mix_ResumeMusic();
-		else
+		else if (Mix_PlayingMusic())
 			Mix_PauseMusic();
 	}
 }
 
 void Core::print(){
+#ifdef _DEBUG
 	for (int i = 0; i < sizeof(_memory) / sizeof(uint8_t); i++){
 		if (i % 16 == 0)
 			if (!i)
@@ -180,14 +200,18 @@ void Core::print(){
 	}
 
 	printf("\n");
+#endif
 }
 
 bool Core::operate(uint8_t lower, uint8_t upper){
+	// Split opcode into parts
 	uint8_t nibbles[4] = { lower >> 4, lower & 0xF, upper >> 4, upper & 0xF };
 	uint16_t tail = ((lower << 8) | upper) & 0x0FFF;
 
+	// Iterate PC
 	_pc += 2;
 
+	// Disassemble opcode
 	switch (nibbles[0]){
 	case 0x0:
 		switch (upper){
@@ -246,7 +270,8 @@ bool Core::operate(uint8_t lower, uint8_t upper){
 		}
 	}
 
-
+#ifdef _DEBUG
 	printf("%02X%02X\n", upper, lower);
+#endif
 	return false;
 }

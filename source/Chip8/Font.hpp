@@ -2,6 +2,9 @@
 
 #include <stdint.h>
 
+// Font sourced from Cowgod's CHIP-8 documentation
+// http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#font
+
 static const uint8_t Font4x5[] = {
 	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
 	0x20, 0x60, 0x20, 0x20, 0x70, // 1
