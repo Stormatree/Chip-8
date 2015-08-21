@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "Screen.hpp"
+#include <SDL_image.h>
 
 Screen::Screen(){
 	_title = "Chip-8 Emulator";
@@ -22,6 +23,7 @@ Screen::Screen(){
 
 Screen::~Screen(){
 	SDL_FreeSurface(_screen);
+	SDL_FreeSurface(_icon);
 	SDL_DestroyWindow(_window);
 }
 
@@ -77,6 +79,15 @@ bool Screen::initiate(){
 	}
 
 	_screen = SDL_GetWindowSurface(_window);
+
+	_icon = IMG_Load("../asset/icon.png");
+
+#ifdef _DEBUG
+	if (!_icon)
+		printf("Cannot load icon!\n");
+#endif
+
+	SDL_SetWindowIcon(_window, _icon);
 
 	render();
 

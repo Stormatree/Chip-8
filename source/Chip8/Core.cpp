@@ -12,8 +12,6 @@ Core::Core(std::string exeLocation){
 	Mix_OpenAudio(44100, AUDIO_S16SYS, 1, 4096);
 
 	// Using a relative location from the exe path
-	exeLocation = exeLocation.substr(0, exeLocation.find_last_of("\\") + 1);
-
 	_tone = Mix_LoadMUS((exeLocation + "..\\asset\\squarewave.ogg").c_str());
 
 #ifdef _DEBUG

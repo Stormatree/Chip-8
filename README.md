@@ -14,7 +14,7 @@ UFO      |  Working
 TICTAC   |  Partially  
 TETRIS   |  Working
 TANK     |  Working
-SYZYGY   |  Partially  
+SYZYGY   |  Working  
 PUZZLE   |  Partially  
 PONG2    |  Working
 PONG     |  Working

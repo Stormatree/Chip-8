@@ -15,6 +15,7 @@ class Screen{
 
 	SDL_Window* _window = 0;
 	SDL_Surface* _screen = 0;
+	SDL_Surface* _icon = 0;
 
 public:
 	Screen();
